@@ -7,7 +7,7 @@
     fish_as_default_shell: true
 
   roles:
-    - system-config
-    - dhcpcd
-    - base_packages
-    - fish_shell
+    - system/system-config
+    - system/dhcpcd
+    - system/base_packages
+    - system/fish_shell
