@@ -1,0 +1,16 @@
+- name: Add metallb to helm repos
+  kubernetes.core.helm_repository:
+    repo_name: metallb
+    repo_url: https://metallb.github.io/metallb
+    state: present
+
+- name: Install metallb from helm
+  kubernetes.core.helm:
+    name: metallb
+    chart_ref: metallb/metallb
+    namespace: metallb-system
+    create_namespace: yes
+    update_repo_cache: yes
+    state: present
+    values_files:
+      - values.yaml

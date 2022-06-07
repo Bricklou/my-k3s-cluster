@@ -1,0 +1,12 @@
+- name: Install helm
+  get_url:
+    url: curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    dest: /home/{{ ansible_user }}/get_helm.sh
+    owner: { { ansible_user } }
+    mode: 0755
+
+- name: Install helm
+  shell: /home/{{ ansible_user }}/get_helm.sh
+
+- name: Check if helm is installed
+  command: helm version
