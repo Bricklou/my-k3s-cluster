@@ -19,10 +19,3 @@ k3s_token: "some-SUPER-DEDEUPER-secret-password"
 # change these to your liking, the only required one is --no-deploy servicelb
 extra_server_args: "--no-deploy servicelb"
 extra_agent_args: ""
-
-# image taf for metal lb
-metal_lb_speaker_tag_version: "v0.12.1"
-metal_lb_controller_tag_version: "v0.12.1"
-
-# metallb ip range for load balancer
-metal_lb_ip_range: "129.168.30.80-129.168.30.90"

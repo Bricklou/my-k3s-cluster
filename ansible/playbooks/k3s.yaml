@@ -1,0 +1,28 @@
+---
+- hosts: all
+  gather_facts: yes
+  become: yes
+  roles:
+    - k3s/download
+    - k3s/raspberry
+
+- hosts: master
+  gather_facts: yes
+  become: yes
+  roles:
+    - k3s/master
+    - nginx
+
+- hosts: workers
+  gather_facts: yes
+  become: yes
+  roles:
+    - k3s/worker
+
+- hosts: master
+  gather_facts: yes
+  become: yes
+  roles:
+    - k3s/roles
+  tags:
+    - roles
