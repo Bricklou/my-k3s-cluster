@@ -1,0 +1,37 @@
+---
+# tasks file for commmon_fish
+- name: Defaut package manager
+  debug: var=ansible_pkg_mgr
+
+- name: Try fish command
+  command: fish --version
+  register: is_fish_existed
+  changed_when: False
+  ignore_errors: true
+
+- name: Is fish existed?
+  debug:
+    msg: "Return code is {{ is_fish_existed }} "
+
+- name: Start install fish on selected OS
+  include_role:
+    name: fish_shell
+    tasks_from: install
+  when: is_fish_existed.rc > 0
+
+- name: Where is fish
+  command: which fish
+  register: fish_location
+  when: fish_as_default_shell
+  changed_when: False
+
+- name: Change user default shell to fish
+  user:
+    name: "{{ ansible_user }}"
+    shell: "{{ fish_location.stdout }}"
+  when: fish_as_default_shell
+
+- name: Set fact for fish_as_default_shell
+  set_fact:
+    fish_as_default_shell: True
+  when: fish_as_default_shell

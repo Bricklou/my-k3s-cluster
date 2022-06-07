@@ -1,0 +1,12 @@
+---
+# defaults file for commmon_fish
+
+#Common package
+common_packages:
+  - wget
+  - curl
+  - which
+  - gnupg2
+
+#Set fish shell as default after installed
+fish_as_default_shell: False

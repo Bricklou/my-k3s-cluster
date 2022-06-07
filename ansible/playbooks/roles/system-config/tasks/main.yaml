@@ -1,0 +1,20 @@
+---
+- name: Set same timezone on every servers
+  timezone:
+    name: "{{ system_timezone }}"
+  when: (system_timezone is defined)
+
+- name: Set hostname
+  hostname:
+    name: "{{ var_hostname }}"
+  when: (var_hostname is defined)
+
+- name: Set boot behavious
+  shell: raspi-config nonint do_boot_behaviour B1 # cli
+
+#I1 Change Locale
+- name: Change locale
+  shell: raspi-config nonint do_change_locale fr_FR.UTF-8
+
+- name: Reboot
+  reboot:

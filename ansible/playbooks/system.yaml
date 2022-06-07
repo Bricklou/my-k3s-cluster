@@ -1,0 +1,13 @@
+---
+- hosts: all
+  gather_facts: yes
+  become: yes
+
+  vars:
+    fish_as_default_shell: true
+
+  roles:
+    - system-config
+    - dhcpcd
+    - base_packages
+    - fish_shell
