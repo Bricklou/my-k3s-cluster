@@ -1,0 +1,96 @@
+# https://traefik.io/blog/install-and-configure-traefik-with-helm/
+# see https://doc.traefik.io/traefik/https/acme/#providers
+# https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
+additionalArguments:
+  - --entrypoints.websecure.http.tls.certresolver=ovh
+  - --entrypoints.websecure.http.tls.domains[0].main=bricklou.ovh
+  - --entrypoints.websecure.http.tls.domains[0].sans=*.bricklou.ovh
+  #- --certificatesresolvers.ovh.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+  # comment the line above when going to production
+  - --certificatesresolvers.ovh.acme.dnschallenge.provider=ovh
+  - --certificatesresolvers.ovh.acme.dnschallenge.resolvers=1.1.1.1:53,8.8.8.8:53
+  - --certificatesresolvers.ovh.acme.storage=/certs/acme.json
+  - --serversTransport.insecureSkipVerify=true
+
+# Logging configuration
+logs:
+  general:
+    level: DEBUG
+
+certresolver:
+  letsencrypt:
+    dnsChallenge:
+      provider: ovh
+      resolvers:
+        - 1.1.1.1:53
+        - 8.8.8.8:53
+    storage: /certs/acme.json
+
+entrypoints:
+  websecure:
+    http:
+      tls:
+        certresolver: ovh
+        domains:
+          - main: "bricklou.ovh"
+          - sans: "*.bricklou.ovh"
+
+ingressRoute:
+  dashboard:
+    enabled: false
+
+persistence:
+  enabled: true
+  # make sure this claim existed
+  existingClaim: acme-json-certs
+  accessMode: ReadWriteOnce
+  size: 128Mi
+  path: /certs
+
+volumes:
+  - mountPath: /data
+    name: traefik-config
+    type: configMap
+
+# without this, ingress get stuck on initializing
+providers:
+  file:
+    filename: /data/traefik-config.yaml
+  kubernetesIngress:
+    ingressClass: traefik-internal
+
+# Port configuration
+ports:
+  web:
+    port: 8080
+    expose: true
+    exposedPort: 80
+
+  websecure:
+    port: 8443
+    expose: true
+    exposedPort: 443
+
+# Environment configuration
+env:
+  - name: OVH_ENDPOINT
+    valueFrom:
+      secretKeyRef:
+        key: ovhEndpoint
+        name: ovh-apikey-secret
+
+  - name: OVH_APPLICATION_KEY
+    valueFrom:
+      secretKeyRef:
+        key: ovhApplicationKey
+        name: ovh-apikey-secret
+  - name: OVH_APPLICATION_SECRET
+    valueFrom:
+      secretKeyRef:
+        key: ovhApplicationSecret
+        name: ovh-apikey-secret
+  - name: OVH_CONSUMER_KEY
+    valueFrom:
+      secretKeyRef:
+        key: ovhConsumerKey
+        name: ovh-apikey-secret

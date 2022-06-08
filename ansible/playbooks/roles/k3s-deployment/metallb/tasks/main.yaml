@@ -12,5 +12,4 @@
     create_namespace: yes
     update_repo_cache: yes
     state: present
-    values_files:
-      - values.yaml
+    values: "{{ lookup('file', 'values.yaml') | from_yaml }}"

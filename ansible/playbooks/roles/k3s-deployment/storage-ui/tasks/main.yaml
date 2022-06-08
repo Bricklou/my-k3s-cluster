@@ -1,0 +1,6 @@
+---
+- name: Create longhorn UI service
+  kubernetes.core.k8s:
+    state: present
+    template:
+      path: "service.yaml.j2"

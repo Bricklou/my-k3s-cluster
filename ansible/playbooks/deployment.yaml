@@ -1,0 +1,32 @@
+---
+- hosts:
+    - master
+    - workers
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: Install required packages
+      apt:
+        pkg:
+          - nfs-common
+          - open-iscsi
+          - util-linux
+        update_cache: yes
+        state: present
+
+- hosts: master
+  gather_facts: yes
+  roles:
+    - name: k3s-deployment/metallb
+      tags:
+        - metallb
+    - name: k3s-deployment/storage
+      tags:
+        - storage
+        - storage-ui
+    - name: k3s-deployment/traefik
+      tags:
+        - traefik
+        - storage-ui
+    - name: k3s-deployment/storage-ui
+      tags: storage-ui

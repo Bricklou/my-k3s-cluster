@@ -1,3 +1,11 @@
+- name: Install PyYaml
+  apt:
+    pkg:
+      - python3-yaml
+      - python3-kubernetes
+    state: present
+    update_cache: yes
+
 - name: Install helm
   get_url:
     url: curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
@@ -10,3 +18,8 @@
 
 - name: Check if helm is installed
   command: helm version
+
+- name: Remove installation script
+  file:
+    path: /home/{{ ansible_user }}/get_helm.sh
+    state: absent

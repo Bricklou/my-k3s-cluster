@@ -1,13 +1,4 @@
 ---
-- name: Install required packages
-  apt:
-    pkg:
-      - nfs-common
-      - open-iscsi
-      - util-linux
-    update_cache: yes
-    state: present
-
 - name: Add longhorn to helm repos
   kubernetes.core.helm_repository:
     repo_name: longhorn
@@ -19,6 +10,7 @@
     path: /storage
     state: directory
     mode: 0755
+  become: yes
 
 - name: Install longhorn from helm
   kubernetes.core.helm:
@@ -31,3 +23,14 @@
     values:
       defaultSettings:
         defaultDataPath: /storage
+
+- name: Make longhorn the default storage class
+  kubernetes.core.k8s:
+    state: patched
+    kind: StorageClass
+    namespace: kube-system
+    name: local-path
+    definition:
+      metadata:
+        annotations:
+          storageclass.kubernetes.io/is-default-class: "false"
