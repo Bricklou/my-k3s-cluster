@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registry
+  namespace: registry
+  labels:
+    name: registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: registry
+  template:
+    metadata:
+      labels:
+        app: registry
+    spec:
+      hostname: registry
+      containers:
+        - name: registry
+          image: registry:2
+          ports:
+            - name: http-registry
+              containerPort: 5000
+          env:
+            - name: REGISTRY_STORAGE_DELETE_ENABLED
+              value: "true"
+          volumeMounts:
+            - name: registry-volume
+              mountPath: /var/lib/registry
+          resources:
+            limits:
+              cpu: "150m"
+              memory: "100Mi"
+        - name: registry-ui
+          image: joxit/docker-registry-ui:1.5-static
+          ports:
+            - name: http-r-ui
+              containerPort: 80
+            - name: http-r-proxy
+              containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: registry-config
+          resources:
+            limits:
+              cpu: "75m"
+              memory: "100Mi"
+      volumes:
+        - name: registry-volume
+          persistentVolumeClaim:
+            claimName: registry-pv-claim
+        - name: registry-config
+          configMap:
+            name: registry-config

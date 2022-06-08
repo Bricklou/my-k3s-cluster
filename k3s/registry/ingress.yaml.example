@@ -1,0 +1,40 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: basicauth
+  namespace: registry
+spec:
+  basicAuth:
+    secret: authsecret
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: registry-ingress
+  namespace: registry
+
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`registry.<your domain>`) && PathPrefix(`/`)
+      services:
+        - kind: Service
+          name: registry-svc
+          namespace: registry
+          port: http-r-ui
+      middlewares:
+        - name: basicauth
+    - kind: Rule
+      match: Host(`registry.<your domain>`) && PathPrefix(`/v2`)
+      services:
+        - kind: Service
+          name: registry-svc
+          namespace: registry
+          port: http-r-proxy
+      middlewares:
+        - name: basicauth
