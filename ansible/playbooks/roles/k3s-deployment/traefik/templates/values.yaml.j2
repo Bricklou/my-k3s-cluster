@@ -2,28 +2,24 @@
 # see https://doc.traefik.io/traefik/https/acme/#providers
 # https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
 additionalArguments:
-  - --entrypoints.websecure.http.tls.certresolver=ovh
-  - --entrypoints.websecure.http.tls.domains[0].main=bricklou.ovh
-  - --entrypoints.websecure.http.tls.domains[0].sans=*.bricklou.ovh
+  {}
   #- --certificatesresolvers.ovh.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
   # comment the line above when going to production
-  - --certificatesresolvers.ovh.acme.dnschallenge.provider=ovh
-  - --certificatesresolvers.ovh.acme.dnschallenge.resolvers=1.1.1.1:53,8.8.8.8:53
-  - --certificatesresolvers.ovh.acme.storage=/certs/acme.json
-  - --serversTransport.insecureSkipVerify=true
 
 # Logging configuration
 logs:
   general:
     level: DEBUG
 
-certresolver:
-  letsencrypt:
+certResolvers:
+  ovh:
+    email: {{ dns_challenge_email }}
     dnsChallenge:
       provider: ovh
+      delayBeforeCheck: 5
       resolvers:
-        - 1.1.1.1:53
-        - 8.8.8.8:53
+        - 1.1.1.1
+        - 8.8.8.8
     storage: /certs/acme.json
 
 entrypoints:
@@ -32,8 +28,8 @@ entrypoints:
       tls:
         certresolver: ovh
         domains:
-          - main: "bricklou.ovh"
-          - sans: "*.bricklou.ovh"
+          - main: {{ domain_main }}
+          - sans: {{ domain_sans }}
 
 ingressRoute:
   dashboard:
@@ -45,7 +41,17 @@ persistence:
   existingClaim: acme-json-certs
   accessMode: ReadWriteOnce
   size: 128Mi
+  name: certs
   path: /certs
+
+deployment:
+  initContainers:
+    - name: volume-permissions
+      image: busybox:1.31.1
+      command: ["sh", "-c", "chmod -Rv 600 /certs/*"]
+      volumeMounts:
+        - name: certs
+          mountPath: /certs
 
 volumes:
   - mountPath: /data
