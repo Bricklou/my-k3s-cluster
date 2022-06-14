@@ -1,0 +1,32 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  namespace: postgres
+  labels:
+    app: postgres
+data:
+  POSTGRES_PASSWORD: <your-password>
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-config
+  namespace: postgres
+  labels:
+    app: postgres
+data:
+  init.sh: |
+    #!/bin/bash
+    set -e
+
+    psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+    	CREATE USER nextcloud WITH PASSWORD '<your-nextcloud-password>';
+    	CREATE DATABASE nextcloud;
+
+      GRANT ALL PRIVILEGES ON DATABASE nextcloud TO nextcloud;
+      ALTER DATABASE nextcloud OWNER TO nextcloud;
+    EOSQL

@@ -1,0 +1,104 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: postgres
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  serviceName: postgres
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      hostname: postgres
+      containers:
+        - name: postgres
+          image: postgres:alpine
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - configMapRef:
+                name: postgres-config
+          env:
+            - name: PGDATA
+              value: /volume/pgdata
+          volumeMounts:
+            - mountPath: /volume
+              name: postgres-volume
+            - mountPath: /docker-entrypoint-initdb.d/
+              name: postgres-init-db
+          resources:
+            limits:
+              cpu: "200m"
+              memory: "100Mi"
+            requests:
+              cpu: "100m"
+              memory: "100Mi"
+          startupProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - postgres
+                - -d
+                - postgres
+            initialDelaySeconds: 120
+            failureThreshold: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 3
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - postgres
+                - -d
+                - postgres
+            initialDelaySeconds: 120
+            periodSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 2
+
+        - name: adminer
+          image: adminer:latest
+          ports:
+            - containerPort: 8080
+          # override of the default CMD to run on IPv4 instead of IPv6
+          command: ["php", "-S", "0.0.0.0:8080", "-t", "/var/www/html"]
+          resources:
+            limits:
+              cpu: 150m
+              memory: 75Mi
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 3
+      volumes:
+        - name: postgres-volume
+          persistentVolumeClaim:
+            claimName: postgres-pv-claim
+        - name: postgres-init-db
+          configMap:
+            name: postgres-init-config
