@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      nodeSelector:
+        node-type: worker
+      containers:
+        - name: redis
+          image: redis:alpine
+          args: ["--appendonly", "yes"]
+          resources:
+            limits:
+              cpu: "50m"
+              memory: "50Mi"
+            requests:
+              cpu: "20m"
+              memory: "10Mi"
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - name: redis-storage
+              mountPath: /data
+          env:
+            - name: ALLOW_EMPTY_PASSWORD
+              value: "yes"
+          readinessProbe:
+            tcpSocket:
+              port: 6379
+            timeoutSeconds: 2
+            failureThreshold: 3
+            successThreshold: 1
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          livenessProbe:
+            tcpSocket:
+              port: 6379
+            timeoutSeconds: 2
+            failureThreshold: 3
+            successThreshold: 1
+            initialDelaySeconds: 30
+            periodSeconds: 30
+
+      volumes:
+        - name: redis-storage
+          persistentVolumeClaim:
+            claimName: redis-pvc
