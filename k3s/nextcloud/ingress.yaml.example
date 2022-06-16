@@ -1,0 +1,31 @@
+---
+# Redirect to https
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: nextcloud-redirectscheme
+  namespace: nextcloud
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nextcloud-ingress
+  namespace: nextcloud
+
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - match: Host(`files.<your domain>`)
+      kind: Rule
+      services:
+        - name: nextcloud-svc
+          port: 80
+      middlewares:
+        - name: nextcloud-redirectscheme

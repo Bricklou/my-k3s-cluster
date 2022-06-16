@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nextcloud
+  namespace: nextcloud
+  labels:
+    name: nextcloud
+spec:
+  replicas: 1
+  serviceName: nextcloud
+  selector:
+    matchLabels:
+      app: nextcloud
+  template:
+    metadata:
+      labels:
+        app: nextcloud
+    spec:
+      hostname: nextcloud
+      containers:
+        - name: nextcloud
+          image: registry.bricklou.ovh/nextcloud:latest
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: nextcloud-volume
+              mountPath: /var/www/html
+          envFrom:
+            - configMapRef:
+                name: nextcloud-config
+          resources:
+            requests:
+              cpu: "1"
+              memory: "500Mi"
+            limits:
+              cpu: "1"
+              memory: "500Mi"
+          livenessProbe:
+            tcpSocket:
+              port: 80
+            initialDelaySeconds: 20
+            timeoutSeconds: 2
+            periodSeconds: 30
+          readinessProbe:
+            tcpSocket:
+              port: 80
+            initialDelaySeconds: 20
+            timeoutSeconds: 2
+            periodSeconds: 30
+          startupProbe:
+            tcpSocket:
+              port: 80
+            initialDelaySeconds: 90
+            periodSeconds: 120
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 20
+      initContainers:
+        - name: nextcloud-init
+          image: registry.bricklou.ovh/nextcloud:latest
+          command:
+            - /bin/sh
+            - -c
+            - chown -R www-data:www-data /var/www/html
+          volumeMounts:
+            - name: nextcloud-volume
+              mountPath: /var/www/html
+      volumes:
+        - name: nextcloud-volume
+          persistentVolumeClaim:
+            claimName: nextcloud-pv-claim
+      restartPolicy: Always

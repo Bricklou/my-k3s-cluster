@@ -33,7 +33,7 @@ spec:
               cpu: "150m"
               memory: "100Mi"
         - name: registry-ui
-          image: joxit/docker-registry-ui:1.5-static
+          image: joxit/docker-registry-ui:latest
           ports:
             - name: http-r-ui
               containerPort: 80
