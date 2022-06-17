@@ -2,7 +2,11 @@
 # see https://doc.traefik.io/traefik/https/acme/#providers
 # https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
 additionalArguments:
-  {}
+  - --entryPoints.web.forwardedHeaders.trustedIPs=127.0.0.1/32,192.168.0.1/16
+  - --entryPoints.websecure.forwardedHeaders.trustedIPs=127.0.0.1/32,192.168.0.1/16
+
+  - --entryPoints.web.proxyProtocol.trustedIPs=127.0.0.1/32,192.168.0.1/16
+  - --entryPoints.websecure.proxyProtocol.trustedIPs=127.0.0.1/32,192.168.0.1/16
   #- --certificatesresolvers.ovh.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
   # comment the line above when going to production
 
@@ -21,15 +25,6 @@ certResolvers:
         - 1.1.1.1
         - 8.8.8.8
     storage: /certs/acme.json
-
-entrypoints:
-  websecure:
-    http:
-      tls:
-        certresolver: ovh
-        domains:
-          - main: {{ domain_main }}
-          - sans: {{ domain_sans }}
 
 ingressRoute:
   dashboard:
@@ -76,6 +71,12 @@ ports:
     port: 8443
     expose: true
     exposedPort: 443
+    tls:
+      enabled: true
+      certResolver: ovh
+      domains:
+        - main: "{{ domain_main }}"
+          sans: ["{{ domain_sans }}"]
 
 # Environment configuration
 env:

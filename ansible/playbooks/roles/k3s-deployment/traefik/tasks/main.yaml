@@ -27,7 +27,7 @@
     create_namespace: yes
     update_repo_cache: yes
     state: present
-    values: "{{ lookup('template', 'values.yaml') | from_yaml }}"
+    values: "{{ lookup('template', './values.yaml.j2') | from_yaml }}"
 
 - name: Create ingress
   kubernetes.core.k8s:

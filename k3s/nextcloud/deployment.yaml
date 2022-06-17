@@ -31,16 +31,16 @@ spec:
           resources:
             requests:
               cpu: "1"
-              memory: "500Mi"
+              memory: "1Gi"
             limits:
               cpu: "1"
-              memory: "500Mi"
+              memory: "1Gi"
           livenessProbe:
             tcpSocket:
               port: 80
             initialDelaySeconds: 20
             timeoutSeconds: 2
-            periodSeconds: 30
+            periodSeconds: 120
           readinessProbe:
             tcpSocket:
               port: 80
