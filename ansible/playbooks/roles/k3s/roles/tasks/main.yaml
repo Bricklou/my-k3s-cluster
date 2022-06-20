@@ -2,5 +2,6 @@
   shell: |
     kubectl label nodes {{ hostvars[item]['var_hostname'] }} kubernetes.io/role=worker
     kubectl label nodes {{ hostvars[item]['var_hostname'] }} node-type=worker
+    kubectl label nodes {{ hostvars[item]['var_hostname'] }} rpi-type={{ hostvars[item]['var_rpi_type'] }}
   with_items:
     - "{{ groups['workers'] }}"
