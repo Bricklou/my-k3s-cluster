@@ -1,0 +1,27 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: epicgames-stripprefix
+  namespace: epicgames-redeem
+spec:
+  stripPrefix:
+    prefixes:
+      - /epic
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: epicgames-ingress
+  namespace: epicgames-redeem
+
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`192.168.1.37`) && PathPrefix(`/epic`)
+      kind: Rule
+      services:
+        - name: epicgames-svc
+          port: 3000

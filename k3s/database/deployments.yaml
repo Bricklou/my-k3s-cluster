@@ -18,6 +18,15 @@ spec:
         app: postgres
     spec:
       hostname: postgres
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: rpi-type
+                    operator: In
+                    values:
+                      - "4"
       containers:
         - name: postgres
           image: postgres:alpine
@@ -37,11 +46,11 @@ spec:
               name: postgres-init-db
           resources:
             limits:
-              cpu: "500m"
-              memory: "100Mi"
+              cpu: "750m"
+              memory: "200Mi"
             requests:
-              cpu: "350m"
-              memory: "100Mi"
+              cpu: "750m"
+              memory: "200Mi"
           startupProbe:
             exec:
               command:

@@ -1,0 +1,47 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: epicgames
+  namespace: epicgames-redeem
+  labels:
+    app: epicgames
+spec:
+  serviceName: epicgames-redeem
+  replicas: 1
+  selector:
+    matchLabels:
+      app: epicgames
+  template:
+    metadata:
+      labels:
+        app: epicgames
+    spec:
+      hostname: epicgames
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: rpi-type
+                    operator: In
+                    values:
+                      - "4"
+      containers:
+        - name: epicgames
+          image: charlocharlie/epicgames-freegames:latest
+          imagePullPolicy: "Always"
+          ports:
+            - name: http-epicgames
+              containerPort: 3000
+          volumeMounts:
+            - name: epicgames-volume
+              mountPath: /usr/app/config
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+      volumes:
+        - name: epicgames-volume
+          persistentVolumeClaim:
+            claimName: epicgames-pv-claim

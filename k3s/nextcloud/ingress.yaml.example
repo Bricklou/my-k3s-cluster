@@ -1,14 +1,23 @@
 ---
-# Redirect to https
+# Nextcloud middlewares
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
-  name: nextcloud-redirectscheme
+  name: nextcloud-middlewares
   namespace: nextcloud
 spec:
   redirectScheme:
     scheme: https
     permanent: true
+  replacePathRegex:
+    regex: "https://(.*)/.well-known/(card|cal)dav"
+    replacement: "https://${1}/remote.php/dav/"
+    permanent: true
+  headers:
+    stsincludesubdomains: false
+    stspreload: true
+    stsseconds: 31536000
+    isdevelopment: false
 
 ---
 apiVersion: traefik.containo.us/v1alpha1

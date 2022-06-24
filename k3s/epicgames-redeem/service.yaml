@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: epicgames-svc
+  namespace: epicgames-redeem
+
+spec:
+  ports:
+    - name: http-epicgames
+      port: 3000
+  selector:
+    app: epicgames

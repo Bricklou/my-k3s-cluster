@@ -17,6 +17,15 @@ spec:
         app: nextcloud
     spec:
       hostname: nextcloud
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: rpi-type
+                    operator: In
+                    values:
+                      - "4"
       containers:
         - name: nextcloud
           image: registry.bricklou.ovh/nextcloud:latest
@@ -30,11 +39,11 @@ spec:
                 name: nextcloud-config
           resources:
             requests:
-              cpu: "1"
-              memory: "1Gi"
+              cpu: "500m"
+              memory: "300Mi"
             limits:
-              cpu: "1"
-              memory: "1Gi"
+              cpu: "500m"
+              memory: "300Mi"
           livenessProbe:
             tcpSocket:
               port: 80
