@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: changedetector-svc
+  namespace: changedetector-io
+
+spec:
+  ports:
+    - name: http-chdtr-io
+      port: 5000
+  selector:
+    app: changedetector-io

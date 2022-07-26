@@ -1,0 +1,43 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: changedetector-stripprefix
+  namespace: changedetector-io
+spec:
+  stripPrefix:
+    prefixes:
+      - /changedetector
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: changedetector-headers
+  namespace: changedetector-io
+spec:
+  headers:
+    customRequestHeaders:
+      Host: "192.168.1.37"
+      X-Forwarded-Prefix: /changedetector
+      X-Forwarded-Proto: http
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: changedetector-ingress
+  namespace: changedetector-io
+
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`192.168.1.37`) && PathPrefix(`/changedetector`)
+      kind: Rule
+      services:
+        - name: changedetector-svc
+          port: 5000
+      middlewares:
+        - name: changedetector-stripprefix
+        - name: changedetector-headers
