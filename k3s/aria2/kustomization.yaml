@@ -1,0 +1,7 @@
+resources:
+  - namepace.yaml
+  - secrets.yaml
+  - volumes.yaml
+  - deploy.yaml
+  - service.yaml
+  - ingress.yaml

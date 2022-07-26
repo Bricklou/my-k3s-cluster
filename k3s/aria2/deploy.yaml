@@ -1,0 +1,93 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: aria2
+  namespace: aria2
+  labels:
+    app: aria2
+spec:
+  replicas: 1
+  serviceName: aria2
+  selector:
+    matchLabels:
+      app: aria2
+  template:
+    metadata:
+      labels:
+        app: aria2
+    spec:
+      hostname: aria2
+      containers:
+        - name: aria2
+          image: p3terx/aria2-pro
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - name: aria2-bt
+              containerPort: 6888
+            - name: aria2-rpc
+              containerPort: 6800
+          envFrom:
+            - configMapRef:
+                name: aria2-config
+          volumeMounts:
+            - name: aria2-config-volume
+              mountPath: /config
+            - name: aria2-dl-volume
+              mountPath: /downloads
+          resources:
+            limits:
+              cpu: "150m"
+              memory: "75Mi"
+            requests:
+              cpu: "150m"
+              memory: "50Mi"
+          startupProbe:
+            tcpSocket:
+              port: 6800
+            failureThreshold: 10
+            periodSeconds: 10
+            initialDelaySeconds: 20
+          readinessProbe:
+            tcpSocket:
+              port: 6800
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 6800
+            periodSeconds: 5
+
+        - name: aria2-web
+          image: p3terx/ariang
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - name: http-aria2-web
+              containerPort: 6880
+          resources:
+            limits:
+              cpu: "15m"
+              memory: "15Mi"
+            requests:
+              cpu: "5m"
+              memory: "5Mi"
+          startupProbe:
+            tcpSocket:
+              port: 6800
+            failureThreshold: 10
+            periodSeconds: 10
+            initialDelaySeconds: 20
+          readinessProbe:
+            tcpSocket:
+              port: 6880
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 6880
+            periodSeconds: 5
+      volumes:
+        - name: aria2-dl-volume
+          persistentVolumeClaim:
+            claimName: aria2-dl-pv-claim
+        - name: aria2-config-volume
+          persistentVolumeClaim:
+            claimName: aria2-cfg-pv-claim

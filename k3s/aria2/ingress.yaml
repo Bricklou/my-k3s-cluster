@@ -1,0 +1,31 @@
+---
+# Redirect to https
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: aria2-stripeprefix
+  namespace: aria2
+spec:
+  stripPrefix:
+    prefixes:
+      - /aria2/
+    forceSlash: true
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: aria2-ingress
+  namespace: aria2
+
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`192.168.1.37`) && PathPrefix(`/aria2`)
+      kind: Rule
+      services:
+        - name: aria2-svc
+          port: aria2-web
+      middlewares:
+        - name: aria2-stripeprefix
