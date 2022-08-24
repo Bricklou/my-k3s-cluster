@@ -1,0 +1,78 @@
+claimToken: "your-claim-token"
+
+image:
+  repository: linuxserver/plex
+  tag: arm64v8-latest
+  pullPolicy: IfNotPresent
+
+kubePlex:
+  enabled: false # kubePlex (transcoder job) is disabled because not available on ARM. The transcoding will be performed by the main Plex instance instead of a separate Job.
+
+timezone: Europe/Paris
+
+service:
+  type: LoadBalancer # We will use a LoadBalancer to obtain a virtual IP that can be exposed to Plex Media via our router
+  port: 32400 # Port to expose Plex
+
+rbac:
+  create: true
+
+env:
+  - name: PUID
+    value: "1000"
+  - name: PGID
+    value: "1000"
+
+nodeSelector:
+  kubernetes.io/arch: arm64
+
+volumes:
+  - name: media
+    persistentVolumeClaim:
+      claimName: "media-pvc"
+
+  # V4L2
+  - name: video0
+    hostPath:
+      path: /dev/video10
+  - name: video1
+    hostPath:
+      path: /dev/video11
+  - name: video2
+    hostPath:
+      path: /dev/video12
+  # DRI
+  - name: dri
+    hostPath:
+      path: /dev/dri
+
+volumeMounts:
+  - name: media
+    mountPath: /data
+    #subPath: "plex-data"
+  - name: media
+    mountPath: /config
+    #subPath: "configs/plex"
+  - name: media
+    mountPath: /transcode
+    #subPath: "plex-transcode"
+
+    # V4L2
+  - mountPath: /dev/video10
+    name: video0
+  - mountPath: /dev/video11
+    name: video1
+  - mountPath: /dev/video12
+    name: video2
+  # DRI
+  - mountPath: /dev/dir
+    name: dri
+
+resources:
+  limits:
+    cpu: 2
+    memory: 1Gi
+
+podAnnotations: {}
+proxy:
+  enable: false

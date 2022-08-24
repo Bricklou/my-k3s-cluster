@@ -1,0 +1,79 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: sonarr
+  namespace: media
+  labels:
+    app: sonarr
+spec:
+  serviceName: sonarr
+  selector:
+    matchLabels:
+      app: sonarr
+  template:
+    metadata:
+      labels:
+        app: sonarr
+    spec:
+      affinity:
+        affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: rpi-type
+                    operator: In
+                    values:
+                      - "4"
+      volumes:
+        - name: "media"
+          persistentVolumeClaim:
+            claimName: media-pvc
+        - name: "sonarr"
+          persistentVolumeClaim:
+            claimName: sonarr-pvc
+
+      containers:
+        - name: sonarr
+          image: linuxserver/sonarr:arm64v8-latest
+          imagePullPolicy: IfNotPresent
+
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+          ports:
+            - name: sonarr-http
+              containerPort: 8989
+              protocol: TCP
+
+          readinessProbe:
+            tcpSocket:
+              port: 8989
+            initialDelaySeconds: 20
+            timeoutSeconds: 2
+            periodSeconds: 30
+
+          startupProbe:
+            tcpSocket:
+              port: 8989
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 20
+          volumeMounts:
+            - name: "sonarr"
+              mountPath: "/config"
+            - name: "media"
+              mountPath: "/downloads"
+              subPath: "downloads/aria2"
+            - name: media
+              mountPath: "/tv"
+              subPath: "library/tv"
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "500Mi"

@@ -1,0 +1,18 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: jackett-ingress
+  namespace: media
+
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`192.168.1.37`) && PathPrefix(`/jackett`)
+      kind: Rule
+      services:
+        - name: jackett-svc
+          passHostHeader: true
+          namespace: media
+          port: 9117

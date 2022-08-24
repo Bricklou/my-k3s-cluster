@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: jackett
+  namespace: media
+  labels:
+    app: jackett
+spec:
+  serviceName: jackett
+  selector:
+    matchLabels:
+      app: jackett
+  template:
+    metadata:
+      labels:
+        app: jackett
+    spec:
+      volumes:
+        - name: "media"
+          persistentVolumeClaim:
+            claimName: media-pvc
+      containers:
+        - name: jackett
+          image: linuxserver/jackett:arm64v8-latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+          ports:
+            - name: jackett-http
+              containerPort: 9117
+              protocol: TCP
+
+          readinessProbe:
+            tcpSocket:
+              port: 9117
+            initialDelaySeconds: 20
+            timeoutSeconds: 2
+            periodSeconds: 30
+
+          startupProbe:
+            tcpSocket:
+              port: 9117
+            initialDelaySeconds: 30
+            periodSeconds: 120
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 20
+          volumeMounts:
+            - name: "media"
+              mountPath: "/config"
+              subPath: "configs/jackett"
+            - name: "media"
+              mountPath: "/downloads"
+              subPath: "downloads/jackett"
+          resources:
+            limits:
+              cpu: "350m"
+              memory: "500Mi"

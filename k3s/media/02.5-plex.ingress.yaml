@@ -1,0 +1,32 @@
+---
+# Plex HTTP to HTTPS middleware
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: plex-redirectscheme
+  namespace: media
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: plex-ingress
+  namespace: media
+
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - match: Host(`plex.bricklou.ovh`)
+      kind: Rule
+      services:
+        - name: "plex-kube-plex"
+          namespace: media
+          port: 32400
+      middlewares:
+        - name: plex-redirectscheme

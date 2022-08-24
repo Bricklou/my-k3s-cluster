@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: radarr
+  namespace: media
+  labels:
+    app: radarr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: radarr
+  template:
+    metadata:
+      labels:
+        app: radarr
+    spec:
+      volumes:
+        - name: "media"
+          persistentVolumeClaim:
+            claimName: media-pvc
+      containers:
+        - name: radarr
+          image: linuxserver/radarr:arm64v8-latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+          ports:
+            - name: radarr-http
+              containerPort: 7878
+              protocol: TCP
+          volumeMounts:
+            - name: "media"
+              mountPath: "/config"
+              subPath: "configs/radarr"
+            - name: "media"
+              mountPath: "/downloads"
+              subPath: "downloads/aria2"
+            - name: media
+              mountPath: "/movies"
+              subPath: "library/movies"
+          resources:
+            limits:
+              cpu: "350m"
+              memory: "300Mi"
