@@ -5,4 +5,3 @@ resources:
   - volumes.yaml
   - deployments.yaml
   - services.yaml
-  - ingress.yaml

@@ -46,10 +46,10 @@ spec:
               name: postgres-init-db
           resources:
             limits:
-              cpu: "750m"
+              cpu: "600m"
               memory: "200Mi"
             requests:
-              cpu: "750m"
+              cpu: "600m"
               memory: "200Mi"
           startupProbe:
             exec:
@@ -77,33 +77,6 @@ spec:
             failureThreshold: 3
             successThreshold: 1
             timeoutSeconds: 2
-
-        - name: adminer
-          image: adminer:latest
-          ports:
-            - containerPort: 8080
-          # override of the default CMD to run on IPv4 instead of IPv6
-          command: ["php", "-S", "0.0.0.0:8080", "-t", "/var/www/html"]
-          resources:
-            limits:
-              cpu: 250m
-              memory: 75Mi
-          readinessProbe:
-            tcpSocket:
-              port: 8080
-            initialDelaySeconds: 30
-            periodSeconds: 30
-            timeoutSeconds: 2
-            successThreshold: 1
-            failureThreshold: 3
-          livenessProbe:
-            tcpSocket:
-              port: 8080
-            initialDelaySeconds: 30
-            periodSeconds: 30
-            timeoutSeconds: 2
-            successThreshold: 1
-            failureThreshold: 3
       volumes:
         - name: postgres-volume
           persistentVolumeClaim:
