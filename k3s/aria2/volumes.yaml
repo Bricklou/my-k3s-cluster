@@ -2,53 +2,33 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: aria2-dl-pv
+  name: aria2-pv
   namespace: aria2
+  labels:
+    type: "nfs"
 spec:
   capacity:
-    storage: 40Gi
-  volumeMode: Filesystem
+    storage: 60Gi
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-storage
+  storageClassName: nfs
   mountOptions:
     - hard
-  local:
-    path: /srv/aria2
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: kubernetes.io/hostname
-              operator: In
-              values:
-                - louis-rpi
+  nfs:
+    path: /srv/media
+    server: 192.168.1.37
 
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: aria2-dl-pv-claim
+  name: aria2-pv-claim
   namespace: aria2
 spec:
-  storageClassName: local-storage
+  storageClassName: nfs
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: 20Gi
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: aria2-cfg-pv-claim
-  namespace: aria2
-spec:
-  storageClassName: longhorn
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 20Mi
+      storage: 60Gi

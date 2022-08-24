@@ -22,6 +22,8 @@ spec:
         - name: aria2
           image: p3terx/aria2-pro
           imagePullPolicy: "IfNotPresent"
+          securityContext:
+            runAsGroup: 1000
           ports:
             - name: aria2-bt
               containerPort: 6888
@@ -30,18 +32,28 @@ spec:
           envFrom:
             - configMapRef:
                 name: aria2-config
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: UMASK_SET
+              value: "022"
           volumeMounts:
-            - name: aria2-config-volume
+            - name: aria2-volume
               mountPath: /config
-            - name: aria2-dl-volume
-              mountPath: /downloads
+              subPath: "configs/aria2"
+
+            - name: "aria2-volume"
+              mountPath: "/downloads"
+              subPath: "downloads/aria2"
           resources:
             limits:
-              cpu: "150m"
-              memory: "75Mi"
+              cpu: "500m"
+              memory: "100Mi"
             requests:
-              cpu: "150m"
-              memory: "50Mi"
+              cpu: "500m"
+              memory: "100Mi"
           startupProbe:
             tcpSocket:
               port: 6800
@@ -85,9 +97,8 @@ spec:
               port: 6880
             periodSeconds: 5
       volumes:
-        - name: aria2-dl-volume
+        - name: aria2-volume
           persistentVolumeClaim:
-            claimName: aria2-dl-pv-claim
-        - name: aria2-config-volume
-          persistentVolumeClaim:
-            claimName: aria2-cfg-pv-claim
+            claimName: aria2-pv-claim
+      securityContext:
+        fsGroup: 1000
