@@ -17,15 +17,6 @@ spec:
         app: nextcloud
     spec:
       hostname: nextcloud
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: rpi-type
-                    operator: In
-                    values:
-                      - "4"
       containers:
         - name: nextcloud
           image: registry.bricklou.ovh/nextcloud:latest
