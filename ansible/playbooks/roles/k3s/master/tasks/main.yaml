@@ -79,5 +79,4 @@
     state: link
 
 - name: Install helm
-  include_role:
-    name: helm
+  include_tasks: helm
