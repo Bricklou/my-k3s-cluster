@@ -1,0 +1,16 @@
+---
+# K3S version, don't forget to update when a new version is released
+k3s_version: v1.28.2+k3s1
+
+# set your timezone
+system_timezone: Europe/Paris
+
+# k3s_token is required, this way masters node can talk together securely
+# this token should be alphanumeric only
+# your can generate a token with the following command:
+# head -c 16 /dev/urandom | shasum -a 256 | cut -d" " -f1
+k3s_token: "mysecrettoken"
+
+# change these to your liking, keep in mind that `servicelb` and `traefik` are disabled by default in the playbooks
+extra_server_args: ""
+extra_agent_args: ""
