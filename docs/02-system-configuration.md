@@ -14,7 +14,7 @@ Once it's done, you need to clone this repository and copy the inventory file:
 $ cp -r ansible/inventories/samples ansible/inventories/cluster
 
 # Run the following command to check if everything is working
-$ ansible all -m ping -i ansible/inventories/inventory
+$ ansible all -m ping -i ansible/inventories/cluster
 ```
 
 ## Configuration
@@ -38,5 +38,5 @@ Once you're done with the configuration, you can launch the configuration using 
 (TODO: ensure the command is correct)
 
 ```sh
-$ ansible-playbook -i ansible/cluster ansible/playbook.yaml
+$ ansible-playbook ansible/playbooks/your_playbook.yaml
 ```

@@ -1,0 +1,10 @@
+---
+- name: Add "liujianfeng1994" repositories
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+    update_cache: yes
+  when: ('orangepi' in group_names)
+  with_items:
+    - deb https://ppa.launchpadcontent.net/liujianfeng1994/panfork-mesa/ubuntu/ jammy main
+    - deb https://ppa.launchpadcontent.net/liujianfeng1994/rockchip-multimedia/ubuntu/ jammy main

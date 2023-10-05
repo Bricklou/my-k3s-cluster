@@ -1,0 +1,22 @@
+---
+- hosts: all
+  gather_facts: true
+  become: yes
+  # since we're not sure if the command "sudo" is already installed, we use "su" instead
+  become_flags: "-"
+  become_method: su
+
+  roles:
+    # First, configure the system settings
+    - role: system/system-config
+      tags: [system]
+    # Then, configure the network settings
+    - role: system/network-config
+      tags: [network]
+    # Configure drivers
+    - role: system/drivers
+      tags: [drivers]
+    #- role: system/users
+    #  tags: [users]
+    #- system/base_packages
+    #- system/shell

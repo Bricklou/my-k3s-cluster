@@ -1,0 +1,24 @@
+---
+- name: Install Network Manager and DHCPCD
+  apt:
+    pkg:
+      - network-manager
+      - dhcpcd
+    update_cache: true
+    state: present
+
+- name: Copy dhcpcd.conf
+  template:
+    src: dhcpcd.conf.j2
+    dest: /etc/dhcpcd.conf
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+    force: yes
+
+- name: Enable Network Manager
+  service:
+    name: NetworkManager
+    enabled: yes
+    state: started

@@ -1,7 +1,7 @@
 all:
   hosts:
     # We're declaring all our nodes here, this way, we can assign them to different groups
-    master:
+    master1:
       ansible_host:
       vars:
         node_name: brk-master
@@ -31,9 +31,12 @@ all:
         node_name: brk-worker4
         static_ip: 192.168.1.204
 
-master:
+  vars:
+
+
+masters:
   hosts:
-    master:
+    master1:
 
 storage:
   hosts:
@@ -53,9 +56,9 @@ gpu_chip:
     worker1:
     worker2:
 
-raspberry_pi:
+raspberry:
   hosts:
-    master:
+    master1:
       vars:
         node_version: 4
     worker3:
@@ -68,10 +71,10 @@ raspberry_pi:
     initial_user: pi
     initial_password: raspberry
 
-orange_pi:
+orangepi:
   hosts:
     worker1:
     worker2:
   vars:
-    initial_user: root
-    initial_password: 1234
+    ansible_ssh_user: root
+    ansible_ssh_pass: 1234

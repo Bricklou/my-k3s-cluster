@@ -1,0 +1,18 @@
+---
+- name: Delete the default user
+  user:
+    name: "{{ ansible_user }}"
+    state: absent
+  when: initial_user != ansible_user
+
+- name: Create the initial user
+  user:
+    name: "{{ initial_user }}"
+    password: "{{ initial_password }}"
+    shell: /bin/bash
+    createhome: yes
+    home: "/home/{{ initial_user }}"
+    state: present
+    append: yes
+    groups: sudo
+  when: initial_user != ansible_user

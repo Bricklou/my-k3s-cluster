@@ -1,0 +1,40 @@
+---
+- name: Set same timezone on all nodes
+  timezone:
+    name: "{{ system_timezone }}"
+  when: (system_timezone is defined)
+
+- name: Set hostname
+  hostname:
+    name: "{{ var_hostname }}"
+  when: (var_hostname is defined)
+
+- name: Set boot behaviour (on raspberry)
+  shell: raspi-config nonint do_boot_behaviour B1
+  # only when the node is in the "raspberry" group
+  when: ('raspberry' in group_names)
+
+- name: Change Locale (Raspberry)
+  shell: raspi-config nonint do_change_locale {{ system_locale | default('fr_FR.UTF-8') }}
+  # only when the node is in the "raspberry" group
+  when: ('raspberry' in group_names)
+
+- name: Ensure the locale exists (Orange Pi)
+  locale_gen:
+    name: "{{ system_locale | default('fr_FR.UTF-8') }}"
+
+    state: present
+  # only when the node is in the "orange_pi" group
+  when: ('orangepi' in group_names)
+
+- name: Install required packages
+  apt:
+    pkg:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg-agent
+      - software-properties-common
+      - python3-apt
+      - sudo
+    state: present

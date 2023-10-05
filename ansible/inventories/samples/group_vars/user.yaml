@@ -1,0 +1,3 @@
+# on normal time, use ansible-vault to encrypt the password
+initial_user: louis
+initial_password: azerty
