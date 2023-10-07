@@ -35,13 +35,13 @@ You should be able to connect with SSH after some time.
 
 ### Orange Pi 5
 
-Compare to the raspberry pi, the configuration for Orange is a bit more complicated when you want to boot on a NVMe drive.
+Compared to the raspberry pi, the configuration for Orange is a bit more complicated when you want to boot on a NVMe drive.
 
 First, you need to flash the Armbian image to the SD card. You can do it using the following command:
 
 ```sh
-$ unxz ./Armbian_23.8.1_Orangepi5_bookworm_legacy_5.10.160.img.xz
-$ sudo dd bs=1M if=./Armbian_23.8.1_Orangepi5_bookworm_legacy_5.10.160.img of=/dev/device_for_sd_card status=progress
+$ unxz ./Armbian_23.8.1_Orangepi5_Bookworm_legacy_5.10.160_minimal.img.xz
+$ sudo dd bs=1M if=./Armbian_23.8.1_Orangepi5_Bookworm_legacy_5.10.160_minimal.img of=/dev/device_for_sd_card status=progress
 $ sudo sync
 ```
 
@@ -55,13 +55,13 @@ sudo nand-install-sata
 
 This will open you a menu. Select the option `Install/Update bootloader on SPI flash` and `Yes`. Now, you can flash the NVMe drive with Armbian.
 
-Like before, to flash the drive, download the Armbian image directly from the OrangePi and flash it using the command below:
+Like before, to flash the drive, download the Armbian (be sure to use the bookworm minimal version!) image directly from the OrangePi and flash it using the command below:
 
 ```sh
-$ unxz ./Armbian_23.8.1_Orangepi5_bookworm_legacy_5.10.160.img.xz
+$ unxz ./Armbian_23.8.1_Orangepi5_Bookworm_legacy_5.10.160_minimal.img.xz
 $ sudo dd bs=1M if=/dev/zero of=/dev/nvme0n1 count=2000 status=progress
 $ sudo sync
-$ sudo dd bs=1M if=./Armbian_23.8.1_Orangepi5_bookworm_legacy_5.10.160.img of=/dev/nvme0n1 status=progress
+$ sudo dd bs=1M if=./Armbian_23.8.1_Orangepi5_Bookworm_legacy_5.10.160_minimal.img of=/dev/nvme0n1 status=progress
 $ sudo sync
 $ sudo fix_mmc_ssd.sh
 ```
