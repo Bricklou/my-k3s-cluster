@@ -23,5 +23,9 @@
     # Install fill shell
     - role: system/shell
       tags: [shell]
-    #- role: system/users
-    #  tags: [users]
+    # Configure user
+    - role: system/users
+      tags: [users]
+    # Finally, configure SSH
+    - role: system/ssh
+      tags: [ssh]

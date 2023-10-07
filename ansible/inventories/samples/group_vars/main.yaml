@@ -16,4 +16,4 @@ extra_server_args: ""
 extra_agent_args: ""
 
 # local ssh key path (default: ~/.ssh/id_rsa.pub)
-local_ssh_key: "~/.ssh/id_rsa.pub"
+local_ssh_key: '/home/user/.ssh/id_rsa.pub'
