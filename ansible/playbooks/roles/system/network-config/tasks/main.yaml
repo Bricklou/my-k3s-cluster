@@ -16,9 +16,11 @@
     mode: 0644
     backup: yes
     force: yes
+  vars:
+    static_ip: "{{ hostvars[inventory_hostname]['vars']['static_ip']  }}"
 
 - name: Enable Network Manager
   service:
     name: NetworkManager
     enabled: yes
-    state: started
+    state: restarted

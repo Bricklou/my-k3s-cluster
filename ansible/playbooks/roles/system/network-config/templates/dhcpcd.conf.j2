@@ -41,6 +41,6 @@ require dhcp_server_identifier
 slaac private
 
 interface eth0
-{%if var_ipv6 is defined %}
-static ip6_address={{ var_ipv6 }}
+{%if static_ip is defined %}
+static ip_address={{ static_ip }}
 {% endif %}
