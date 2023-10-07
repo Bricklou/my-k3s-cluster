@@ -1,10 +1,30 @@
 ---
+# All the information was found at: https://dragonserw.ru/arm64:orangepi-5
+
 - name: Add "liujianfeng1994" repositories
   apt_repository:
     repo: "{{ item }}"
     state: present
-    update_cache: yes
   when: ('orangepi' in group_names)
   with_items:
     - deb https://ppa.launchpadcontent.net/liujianfeng1994/panfork-mesa/ubuntu/ jammy main
     - deb https://ppa.launchpadcontent.net/liujianfeng1994/rockchip-multimedia/ubuntu/ jammy main
+
+# This step is VERY important! The repositories from liujianfeng1994 provide their own version of "libc6", "libc-bin" and "locales"
+# but the provided version are not up-to-date, so we absolutely need to stick to the official version of these packages.
+- name: Alter the apt preferences
+  copy:
+    src: apt_preferences
+    dest: /etc/apt/preferences.d/panfrost
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+  when: ('orangepi' in group_names)
+
+- name: Install GPU/VPU drivers packages
+  apt:
+    update_cache: yes
+    pkg:
+      - mali-g610-firmware
+      - rockchip-multimedia-config
