@@ -15,7 +15,8 @@ For the Orange Pi 5, i'm using the unofficial Armbian distribution, which is als
 
 ### Raspberry Pi 4B & 3B+
 
-For raspberry pi, the installation is very simple: select "Raspberry Pi OS Lite (64-bits)" in the RPi Imager, and flash it to the SD card (or whatever storage you're using). Don't forget to configure SSH and your account informations. Once it's finished, you can plug the storage to the Raspberry Pi and boot it up.
+For raspberry pi, the installation is very simple: select "Raspberry Pi OS Lite (64-bits)" in the RPi Imager, and flash it to the SD card (or whatever storage you're using).
+Don't forget to configure SSH and your account information (this user will be our permanent user). Once it's finished, you can plug the storage to the Raspberry Pi and boot it up.
 
 > **Note**
 > In order to boot on an USB device, you need to update the bootloader. To do so, you first need to flash a SD card with "Raspberry Pi 4 EEPROM Boot Recovery" and boot it up. The bootloader will be updated to the latest version, and the green LED on Pi will continuously flash. The monitor will
@@ -27,7 +28,7 @@ For raspberry pi, the installation is very simple: select "Raspberry Pi OS Lite 
 > $ sudo raspi-config
 > ```
 >
-> Them select `1 System options`, `A6 Boot order`, `B1 USB Boot` and finally `OK`. Reboot the Pi and it should boot on USB.
+> Then select `1 System options`, `A6 Boot order`, `B1 USB Boot` and finally `OK`. Reboot the Pi and it should boot on USB.
 >
 > _Source: https://fossbytes.com/enable-usb-boot-on-raspberry-pi/_
 
@@ -66,4 +67,10 @@ $ sudo sync
 $ sudo fix_mmc_ssd.sh
 ```
 
-Finally, shutdown the system, unplug the SD card, now it is ready!
+Finally, shutdown the system, unplug the SD card and boot the system. You should be able to connect with SSH after some time.
+Connect using the default user `root` and the default password `1234`.
+
+At this moment, a complete prompt will show, just complete it (It should ask root and user information). A shell will
+show when it's done.
+
+Now you are ready for the next step!

@@ -29,14 +29,14 @@ The inventory file is located in `ansible/inventories/inventory.yaml`. You can e
 
 The variables are located in `ansible/inventories/group_vars/main.yaml`. This file contains all the variables that will be used by Ansible to configure the hosts.
 
-You can edit this file to change the configuration of your hosts.
+You can edit this file to change the configuration of your hosts. Be sure to configure properly host variables, `ansible_ssh_user` and
+`ansible_ssh_password` are required to be able to connect to the host.
 
 ### Launch the configuration
 
 Once you're done with the configuration, you can launch the configuration using the following command:
 
-(TODO: ensure the command is correct)
-
 ```sh
-$ ansible-playbook ansible/playbooks/your_playbook.yaml
+$ cd ansible
+$ ansible-playbook playbooks/your_playbook.yaml
 ```
