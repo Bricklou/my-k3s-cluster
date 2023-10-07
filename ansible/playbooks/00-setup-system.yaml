@@ -16,7 +16,11 @@
     # Configure drivers
     - role: system/drivers
       tags: [drivers]
+    # Configure base packages
+    - role: system/base_packages
+      tags: [base_packages]
+    # Install fill shell
+    - role: system/shell
+      tags: [shell]
     #- role: system/users
     #  tags: [users]
-    #- system/base_packages
-    #- system/shell

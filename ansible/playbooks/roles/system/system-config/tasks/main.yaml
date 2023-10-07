@@ -36,5 +36,6 @@
       - gnupg-agent
       - software-properties-common
       - python3-apt
+      - python3-launchpadlib
       - sudo
     state: present

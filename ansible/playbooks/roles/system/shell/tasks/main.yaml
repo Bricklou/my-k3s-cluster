@@ -1,0 +1,14 @@
+---
+- name: Try fish command
+  command: fish --version
+  register: is_fish_existed
+  changed_when: False
+  ignore_errors: true
+
+- name: Is fish existed?
+  debug:
+    msg: "Return code is {{ is_fish_existed.rc }} "
+
+- name: Start install fish on selected OS
+  include_tasks: ./install.yaml
+  when: is_fish_existed.rc > 0

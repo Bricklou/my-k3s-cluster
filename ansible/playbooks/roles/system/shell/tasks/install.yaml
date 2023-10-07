@@ -1,0 +1,24 @@
+- name: Install common packages for fish
+  apt:
+    pkg:
+      - which
+    state: present
+  ignore_errors: true
+
+- name: Add repositories apt key
+  apt_key:
+    url: https://download.opensuse.org/repositories/shells:fish:release:3/Debian_12/Release.key
+    keyring: /etc/apt/trusted.gpg.d/fish.gpg
+    state: present
+
+- name: Add repositories apt
+  apt_repository:
+    repo: deb https://download.opensuse.org/repositories/shells:/fish:/release:/3/Debian_12/ /
+    state: present
+
+- name: Install fish
+  apt:
+    name: fish
+    state: present
+    update_cache: yes
+  register: installed
