@@ -16,6 +16,7 @@
     # Configure drivers
     - role: system/drivers
       tags: [drivers]
+      when: ('orangepi' in group_names)
     # Configure base packages
     - role: system/base_packages
       tags: [base_packages]

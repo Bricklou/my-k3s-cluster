@@ -6,8 +6,8 @@
 
 - name: Set hostname
   hostname:
-    name: "{{ var_hostname }}"
-  when: (var_hostname is defined)
+    name: "{{ hostvars[inventory_hostname]['vars']['node_name'] }}"
+  when: (hostvars[inventory_hostname]['vars']['node_name'] is defined)
 
 - name: Set boot behaviour (on raspberry)
   shell: raspi-config nonint do_boot_behaviour B1

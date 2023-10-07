@@ -5,33 +5,34 @@ all:
       ansible_host:
       vars:
         node_name: brk-master
-        static_ip: 192.168.1.200
+        static_ip: 192.168.1.200/24
 
     worker1:
       ansible_host:
       vars:
         node_name: brk-worker1
-        static_ip: 192.168.1.201
+        static_ip: 192.168.1.201/24
 
     worker2:
       ansible_host:
       vars:
         node_name: brk-worker2
-        static_ip: 192.168.1.202
+        static_ip: 192.168.1.202/24
 
     worker3:
       ansible_host:
       vars:
         node_name: brk-worker3
-        static_ip: 192.168.1.203
+        static_ip: 192.168.1.203/24
 
     worker4:
       ansible_host:
       vars:
         node_name: brk-worker4
-        static_ip: 192.168.1.204
+        static_ip: 192.168.1.204/24
 
   vars:
+    static_gw: 192.168.1.1/24
 
 
 masters:
@@ -68,8 +69,8 @@ raspberry:
       vars:
         node_version: 3
   vars:
-    initial_user: pi
-    initial_password: raspberry
+    ansible_ssh_user: my_user
+    initial_password: my_pass
 
 orangepi:
   hosts:
@@ -78,3 +79,6 @@ orangepi:
   vars:
     ansible_ssh_user: root
     ansible_ssh_pass: 1234
+
+    initial_user: my_user
+    initial_password: my_pass
