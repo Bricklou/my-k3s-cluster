@@ -5,10 +5,11 @@
   apt_repository:
     repo: "{{ item }}"
     state: present
+    codename: jammy
   when: ('orangepi' in group_names)
   with_items:
-    - deb https://ppa.launchpadcontent.net/liujianfeng1994/panfork-mesa/ubuntu/ jammy main
-    - deb https://ppa.launchpadcontent.net/liujianfeng1994/rockchip-multimedia/ubuntu/ jammy main
+    - ppa:liujianfeng1994/panfork-mesa
+    - ppa:liujianfeng1994/rockchip-multimedia
 
 # This step is VERY important! The repositories from liujianfeng1994 provide their own version of "libc6", "libc-bin" and "locales"
 # but the provided version are not up-to-date, so we absolutely need to stick to the official version of these packages.
