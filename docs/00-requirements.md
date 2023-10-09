@@ -1,6 +1,6 @@
 # Hardware requirements
 
-At the time i'm writing this document, i have the following hardware:
+At the time I'm writing this document, I have the following hardware:
 
 - A Raspberry Pi 4B 4GB
 - 2 Raspberry Pi 3B+

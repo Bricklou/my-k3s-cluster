@@ -13,7 +13,7 @@
     state: present
     autoconnect: yes
 
-- name: Configure statuc ip v6 through NetworkManager
+- name: Configure static ip v6 through NetworkManager
   nmcli:
       conn_name: eth0
       type: ethernet

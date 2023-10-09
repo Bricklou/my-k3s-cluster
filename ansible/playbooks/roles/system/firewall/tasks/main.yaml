@@ -1,0 +1,91 @@
+---
+- name: Install UFW
+  apt:
+    name: ufw
+    state: latest
+  tags: [firewall]
+
+- name: Ensure UFW is disabled
+  ufw:
+    state: disabled
+  tags: [firewall]
+
+- name: Start UFW service
+  service:
+      name: ufw
+      state: started
+      enabled: yes
+  tags: [firewall]
+
+- name: Clear all rules
+  ufw:
+      rule: "{{ item }}"
+      state: absent
+  with_items:
+      - allow
+      - deny
+      - reject
+  tags: [firewall]
+
+- name: Deny everything and enable UFW
+  ufw:
+    policy: deny
+  tags: [firewall]
+
+- name: Allow OpenSSH coming from local network (v4)
+  ufw:
+    rule: allow
+    port: 22
+    name: OpenSSH
+    from_ip: "{{ hostvars[inventory_hostname]['vars']['static_ip'] }}"
+  tags: [firewall]
+
+- name: Allow OpenSSH coming from local network (v6)
+  ufw:
+      rule: allow
+      port: 22
+      name: OpenSSH
+      from_ip: "{{ hostvars[inventory_hostname]['vars']['static_ip6'] }}"
+  when: (hostvars[inventory_hostname]['vars']['static_ip6'] is defined)
+  tags: [firewall]
+
+- name: Allow HTTP(S)
+  ufw:
+    rule: allow
+    name: WWW Full
+  tags: [firewall]
+  when: ("masters" in group_names)
+
+- name: Allow k3s (v4)
+  ufw:
+    rule: allow
+    port: 6443
+    proto: tcp
+    comment: "k3s"
+    from_ip: "{{ hostvars[inventory_hostname]['vars']['static_ip'] }}"
+  tags: [firewall]
+  when: ("masters" in group_names)
+
+- name: Allow k3s (v6)
+  ufw:
+      rule: allow
+      port: 6443
+      proto: tcp
+      comment: "k3s"
+      from_ip: "{{ hostvars[inventory_hostname]['vars']['static_ip6'] }}"
+  tags: [firewall]
+  when: ("masters" in group_names) and (hostvars[inventory_hostname]['vars']['static_ip6'] is defined)
+
+- name: Allow VPN
+  ufw:
+      rule: allow
+      port: 1194
+      proto: udp
+      comment: "VPN"
+  tags: [firewall]
+  when: ("masters" in group_names)
+
+- name: Enable UFW
+  ufw:
+    state: enabled
+  tags: [firewall]

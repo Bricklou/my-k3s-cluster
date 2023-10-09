@@ -38,4 +38,5 @@
       - python3-apt
       - python3-launchpadlib
       - sudo
+      - htop
     state: present

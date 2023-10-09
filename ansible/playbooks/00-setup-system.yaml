@@ -26,6 +26,10 @@
     # Configure user
     - role: system/users
       tags: [users]
-    # Finally, configure SSH
+    # Configure SSH
     - role: system/ssh
       tags: [ssh]
+
+    # Finally, configure the firewall
+    - role: system/firewall
+      tags: [firewall]
