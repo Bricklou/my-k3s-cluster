@@ -17,6 +17,8 @@ This way, I only need to expose the minimum required: http/https and vpn ports.
 To manage my cluster internal network, I will work with [Kube-VIP](https://kube-vip.io/), a load balancer for Kubernetes clusters.
 It will help me to manage the internal network and the load balancing between the nodes.
 
+Some explanation video: https://youtu.be/NslXSagv3mU
+
 ### VPN
 
 To configure my VPN, I will obviously use OpenVPN, but, I recently discovered ovpn-admin, a web interface to manage OpenVPN.

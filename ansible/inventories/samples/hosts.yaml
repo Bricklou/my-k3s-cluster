@@ -5,7 +5,10 @@ all:
       ansible_host:
       vars:
         node_name: brk-master
+        # data can be found using the command "ip a" on the node itself
         static_ip: 192.168.1.200/24
+        # data can be found using the command "ip r" on the node itself
+        static_gw: 192.168.1.1
         node_version: 4
 
     worker1:
@@ -13,12 +16,14 @@ all:
       vars:
         node_name: brk-worker1
         static_ip: 192.168.1.201/24
+        static_gw: 192.168.1.1
 
     worker2:
       ansible_host:
       vars:
         node_name: brk-worker2
         static_ip: 192.168.1.202/24
+        static_gw: 192.168.1.1
 
     worker3:
       ansible_host:
@@ -26,6 +31,7 @@ all:
         node_name: brk-worker3
         static_ip: 192.168.1.203/24
         node_version: 3
+        static_gw: 192.168.1.1
 
     worker4:
       ansible_host:
@@ -33,9 +39,7 @@ all:
         node_name: brk-worker4
         static_ip: 192.168.1.204/24
         node_version: 3
-
-  vars:
-    static_gw: 192.168.1.1/24
+        static_gw: 192.168.1.1
 
 
 masters:
@@ -66,6 +70,7 @@ raspberry:
     worker3:
     worker4:
   vars:
+    # you should store these data in group_vars folder with ansible vault
     ansible_ssh_user: my_user
     initial_password: my_pass
     node_type: raspberry
@@ -76,6 +81,7 @@ orangepi:
     worker1:
     worker2:
   vars:
+    # you should store these data in group_vars folder with ansible vault
     ansible_ssh_user: root
     ansible_ssh_pass: 1234
     node_type: orangepi

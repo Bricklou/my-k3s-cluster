@@ -3,7 +3,7 @@
   command: fish --version
   register: is_fish_existed
   changed_when: False
-  ignore_errors: true
+  failed_when: False
 
 - name: Is fish existed?
   debug:

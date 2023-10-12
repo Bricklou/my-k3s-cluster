@@ -10,44 +10,18 @@
     state: disabled
   tags: [firewall]
 
-- name: Start UFW service
-  service:
-      name: ufw
-      state: started
-      enabled: yes
-  tags: [firewall]
-
 - name: Clear all rules
   ufw:
-      rule: "{{ item }}"
-      state: absent
-  with_items:
-      - allow
-      - deny
-      - reject
+    state: reset
   tags: [firewall]
 
-- name: Deny everything and enable UFW
-  ufw:
-    policy: deny
-  tags: [firewall]
-
-- name: Allow OpenSSH coming from local network (v4)
+- name: Allow OpenSSH coming from local network
   ufw:
     rule: allow
-    port: 22
-    name: OpenSSH
-    from_ip: "{{ hostvars[inventory_hostname]['vars']['static_ip'] }}"
+    name: SSH
+    from_ip: "{{ item }}"
   tags: [firewall]
-
-- name: Allow OpenSSH coming from local network (v6)
-  ufw:
-      rule: allow
-      port: 22
-      name: OpenSSH
-      from_ip: "{{ hostvars[inventory_hostname]['vars']['static_ip6'] }}"
-  when: (hostvars[inventory_hostname]['vars']['static_ip6'] is defined)
-  tags: [firewall]
+  with_items: "{{ firewall_allowed_local_ips }}"
 
 - name: Allow HTTP(S)
   ufw:
@@ -56,25 +30,15 @@
   tags: [firewall]
   when: ("masters" in group_names)
 
-- name: Allow k3s (v4)
+- name: Allow k3s
   ufw:
     rule: allow
     port: 6443
     proto: tcp
     comment: "k3s"
-    from_ip: "{{ hostvars[inventory_hostname]['vars']['static_ip'] }}"
+    from_ip: "{{ item }}"
   tags: [firewall]
-  when: ("masters" in group_names)
-
-- name: Allow k3s (v6)
-  ufw:
-      rule: allow
-      port: 6443
-      proto: tcp
-      comment: "k3s"
-      from_ip: "{{ hostvars[inventory_hostname]['vars']['static_ip6'] }}"
-  tags: [firewall]
-  when: ("masters" in group_names) and (hostvars[inventory_hostname]['vars']['static_ip6'] is defined)
+  with_items: "{{ firewall_allowed_local_ips }}"
 
 - name: Allow VPN
   ufw:
@@ -84,6 +48,25 @@
       comment: "VPN"
   tags: [firewall]
   when: ("masters" in group_names)
+
+- name: Deny everything incoming
+  ufw:
+    policy: deny
+    direction: incoming
+  tags: [firewall]
+
+- name: Allow everything outgoing
+  ufw:
+    policy: allow
+    direction: outgoing
+  tags: [firewall]
+
+- name: Start UFW service
+  service:
+    name: ufw
+    state: started
+    enabled: yes
+  tags: [firewall]
 
 - name: Enable UFW
   ufw:
