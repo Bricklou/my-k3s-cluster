@@ -19,6 +19,16 @@ $ ansible all -m ping -i ansible/inventories/cluster
 
 ## Configuration
 
+### Root password
+
+Before running any of the roles, you need to configure the root password, to do so, you need to run the following command in SSH:
+
+```sh
+$ sudo su # on raspberry pi
+$ su - # on orange pi
+$ passwd
+```
+
 ### Inventory
 
 The inventory file is the file that contains all the hosts that will be configured by Ansible. In our case, we have 3 hosts: 1 Raspberry Pi 4B, 2 Raspberry Pi 3B+ and 2 Orange Pi 5.
