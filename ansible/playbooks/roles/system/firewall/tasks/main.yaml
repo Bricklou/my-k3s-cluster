@@ -30,20 +30,22 @@
   tags: [firewall]
   when: ("masters" in group_names)
 
-- name: Allow k3s
+- name: Allow k3s ports (2379-2380, 6443)
   ufw:
     rule: allow
-    port: 6443
+    port: "{{ item[1] }}"
     proto: tcp
     comment: "k3s"
-    from_ip: "{{ item }}"
+    from_ip: "{{ item[0] }}"
   tags: [firewall]
-  with_items: "{{ firewall_allowed_local_ips }}"
+  with_nested:
+    - "{{ firewall_allowed_local_ips }}"
+    - [2379, 2380, 6443]
 
 - name: Allow VPN
   ufw:
       rule: allow
-      port: 1194
+      port: "1194"
       proto: udp
       comment: "VPN"
   tags: [firewall]

@@ -16,3 +16,11 @@
       - sudo
       - gnupg2
     state: present
+
+- name: Write tmux config
+  copy:
+      src: tmux.conf
+      dest: /home/{{ ansible_user }}/.tmux.conf
+      owner: "{{ ansible_user }}"
+      group: "{{ ansible_user }}"
+      mode: "u=rw,g=,o="
