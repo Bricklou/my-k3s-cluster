@@ -27,6 +27,14 @@
   tags:
     - masters
 
+- hosts: masters
+  gather_facts: yes
+  become: yes
+  roles:
+    - k3s/fetch-token
+  tags:
+    - workers
+
 - hosts: workers
   gather_facts: yes
   become: yes

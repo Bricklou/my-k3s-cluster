@@ -1,0 +1,20 @@
+---
+- name: Copy K3S service file
+  template:
+    src: "k3s.service.j2"
+    dest: "/etc/systemd/system/k3s.service"
+    owner: root
+    group: root
+    mode: 0644
+  vars:
+    server_init_args: "{{ boot_arg }} --token {{ token }} {{ common_server_init_args | default('') }}"
+  become: yes
+  tags: [workers]
+
+- name: Enable and check K3s service
+  systemd:
+    name: k3s
+    daemon_reload: yes
+    state: restarted
+    enabled: yes
+  tags: [workers]

@@ -70,7 +70,7 @@ $ sudo fix_mmc_ssd.sh
 Finally, shutdown the system, unplug the SD card and boot the system. You should be able to connect with SSH after some time.
 Connect using the default user `root` and the default password `1234`.
 
-At this moment, a complete prompt will show, just complete it (It should ask root and user information). A shell will
+At this moment, a prompt will show, just complete it (It should ask root and user information). A shell will
 show when it's done.
 
 Now you are ready for the next step!

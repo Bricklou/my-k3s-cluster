@@ -1,15 +1,21 @@
 ---
-- name: Copy K3s service file
-  template:
-    src: "k3s.service.j2"
-    dest: "/etc/systemd/system/k3s.service"
-    owner: root
-    group: root
-    mode: 0755
-
-- name: Enable and check K3s service
+- name: Stop k3s-init
   systemd:
-    name: k3s
-    daemon_reload: yes
-    state: restarted
-    enabled: yes
+    name: k3s-init
+    state: stopped
+  failed_when: false
+  tags: [workers]
+
+- name: Clean previous runs of k3s-init
+  # The systemd module does not support "reset-failed", so we need to resort to command.
+  command: systemctl reset-failed k3s-init
+  failed_when: false
+  changed_when: false
+  tags: [workers]
+
+- name: Start k3s service (workers)
+  include_tasks: k3s-init.yaml
+  vars:
+    boot_arg: --server https://{{ master_ip }}:6443
+    token: "{{ hostvars[groups['masters'][0]]['main_token'] }}"
+  tags: [workers]
