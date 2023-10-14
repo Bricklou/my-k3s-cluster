@@ -1,0 +1,101 @@
+---
+- name: Install helm
+  include_tasks: helm.yaml
+  tags: [helm, masters, master]
+
+- name: Stop k3s-init
+  systemd:
+    name: k3s-init
+    state: stopped
+  failed_when: false
+  tags: [masters, master]
+
+- name: Clean previous runs of k3s-init
+  # The systemd module does not support "reset-failed", so we need to resort to command.
+  command: systemctl reset-failed k3s-init
+  failed_when: false
+  changed_when: false
+  tags: [masters, master]
+
+- name: Prepare main master
+  tags: [ masters, master ]
+  when: ansible_host == master_ip
+  block:
+    - name: Start k3s service (main master init)
+      include_tasks: k3s-init.yaml
+      vars:
+        boot_arg: --cluster-init
+        token: "{{ k3s_token }}"
+
+    - name: Wait for k3s-init to finish
+      wait_for:
+          path: "{{ k3s_server_location }}/server/node-token"
+
+    - name: Register node-token file access mode
+      stat:
+          path: /var/lib/rancher/k3s/server
+      register: p
+
+    - name: Change file access node-token
+      file:
+        path: /var/lib/rancher/k3s/server
+        mode: "g+rx,o+rx"
+
+    - name: Read node-token from master
+      slurp:
+        src: /var/lib/rancher/k3s/server/node-token
+      register: node_token
+      tags: [masters, master]
+
+    - name: Store Master node-token
+      set_fact:
+        main_token: "{{ node_token.content | b64decode | regex_replace('\n', '') }}"
+      tags: [masters, master]
+
+    - name: Restore node-token file access
+      file:
+        path: /var/lib/rancher/k3s/server
+        mode: "{{ p.stat.mode }}"
+
+- name: Start k3s service (others masters)
+  when: ansible_host != master_ip
+  tags: [masters, master]
+  block:
+    - name: Start k3s service (others masters init)
+      include_tasks: k3s-init.yaml
+      vars:
+        boot_arg: --server https://{{ master_ip }}:6443
+        token: "{{ hostvars[groups['masters'][0]]['main_token'] }}"
+
+- name: Create directory .kube
+  file:
+    path: /home/{{ ansible_user }}/.kube
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "u=rwx,g=rx,o="
+  tags: [masters, master]
+
+- name: Copy config file to user home directory
+  copy:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: /home/{{ ansible_user }}/.kube/config
+    remote_src: yes
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "u=rw,g=,o="
+  tags: [masters, master]
+
+- name: Replace https://localhost:6443 by https://kube_vip_address:6443
+  command: >-
+    sed -i 's/127.0.0.1/'{{ kube_vip_address }}'/g' /home/{{ ansible_user }}/.kube/config
+  changed_when: true
+  tags: [masters, master]
+
+- name: Change ownership of config file
+  file:
+    path: /home/{{ ansible_user }}/.kube/config
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "u=rw,g=,o="
+  tags: [masters, master]

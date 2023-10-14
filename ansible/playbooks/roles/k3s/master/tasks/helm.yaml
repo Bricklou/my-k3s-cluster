@@ -1,0 +1,29 @@
+- name: Install PyYaml
+  apt:
+    pkg:
+      - python3-yaml
+      - python3-kubernetes
+    state: present
+  tags: [helm, masters, master]
+
+- name: Install helm
+  get_url:
+    url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    dest: /home/{{ ansible_user }}/get_helm.sh
+    owner: "{{ ansible_user }}"
+    mode: 0755
+  tags: [helm, masters, master]
+
+- name: Install helm
+  shell: /home/{{ ansible_user }}/get_helm.sh
+  tags: [helm, masters, master]
+
+- name: Check if helm is installed
+  command: helm version
+  tags: [helm, masters, master]
+
+- name: Remove installation script
+  file:
+    path: /home/{{ ansible_user }}/get_helm.sh
+    state: absent
+  tags: [helm, masters, master]

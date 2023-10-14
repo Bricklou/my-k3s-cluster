@@ -1,0 +1,45 @@
+---
+- hosts: all
+  gather_facts: yes
+  become: yes
+  roles:
+    - k3s/download
+  tags:
+    - download
+    - masters
+
+- hosts: raspberry
+  gather_facts: yes
+  become: yes
+  roles:
+    - role: k3s/raspberry
+  tags:
+    - raspberry
+
+- hosts: masters
+  gather_facts: yes
+  become: yes
+  roles:
+    - name: k3s/kube-vip
+      tags: [masters, kube-vip]
+    - name: k3s/master
+      tags: [masters, master]
+  tags:
+    - masters
+
+- hosts: workers
+  gather_facts: yes
+  become: yes
+  roles:
+    - k3s/worker
+  tags:
+    - workers
+
+- hosts: masters
+  gather_facts: yes
+  become: yes
+  roles:
+    - k3s/cluster
+  tags:
+    - masters
+    - local_test

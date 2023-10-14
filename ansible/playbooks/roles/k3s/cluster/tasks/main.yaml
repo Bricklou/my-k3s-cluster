@@ -1,0 +1,35 @@
+- set_fact:
+    key_value:
+      deviceType: "{{ hostvars[item]['vars']['node_type'] }}"
+  when: ("orangepi" in group_names)
+
+- set_fact:
+    key_value:
+      deviceType: "{{ hostvars[item]['vars']['node_type'] }}-{{ hostvars[item]['vars']['node_version'] }}"
+  when: ("raspberry" in group_names)
+
+- name: Configure roles
+  shell: |
+    kubectl label nodes {{ hostvars[item]['var_hostname'] }} kubernetes.io/role=worker
+    kubectl label nodes {{ hostvars[item]['var_hostname'] }} node-type=worker
+    kubectl label nodes {{ hostvars[item]['var_hostname'] }} device-type={{ deviceType }}
+  with_items:
+    - "{{ groups['workers'] }}"
+
+- name: Install kube-vip cloud controller
+  # kubectl
+  kubernetes.core.k8s:
+    state: present
+    src: https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
+
+- name: Configure global CIDR for kube-vip
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: kube-vip-config
+        namespace: kube-system
+      data:
+        cidr-global: 192.168.200.0/24

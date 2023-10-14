@@ -1,0 +1,19 @@
+---
+- name: Delete previous k3s directory
+  file:
+      path: "{{ item }}"
+      state: absent
+  become: yes
+  with_items:
+    - "{{ k3s_server_location }}"
+    - /home/{{ ansible_ssh_user }}/.kube
+    - /etc/rancher
+  tags: [masters, kube-vip]
+
+- name: Flush local addresses
+  command: ip addr flush dev lo
+  tags: [masters, kube-vip]
+
+- name: Add localhost address
+  command: ip addr add 127.0.0.1/8 dev lo
+  tags: [masters, kube-vip]

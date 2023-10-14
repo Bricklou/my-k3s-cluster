@@ -1,0 +1,11 @@
+---
+- name: Enable container features
+  replace:
+    path: /boot/cmdline.txt
+    regexp: '^([\w](?!.*\b{{ item }}\b).*)$'
+    replace: '\1 {{ item }}'
+  with_items:
+    - "cgroup_enable=cpuset"
+    - "cgroup_memory=1"
+    - "cgroup_enable=memory"
+  notify: reboot system
