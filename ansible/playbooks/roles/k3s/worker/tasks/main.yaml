@@ -19,3 +19,37 @@
     boot_arg: --server https://{{ master_ip }}:6443
     token: "{{ hostvars[groups['masters'][0]]['main_token'] }}"
   tags: [workers]
+
+
+- name: Create directory .kube
+  file:
+    path: /home/{{ ansible_user }}/.kube
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "u=rwx,g=rx,o="
+  tags: [masters, master]
+
+- name: Copy config file to user home directory
+  copy:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: /home/{{ ansible_user }}/.kube/config
+    remote_src: yes
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "u=rw,g=,o="
+  tags: [masters, master]
+
+- name: Replace https://localhost:6443 by https://kube_vip_address:6443
+  command: >-
+    sed -i 's/127.0.0.1/'{{ kube_vip_address }}'/g' /home/{{ ansible_user }}/.kube/config
+  changed_when: true
+  tags: [masters, master]
+
+- name: Change ownership of config file
+  file:
+    path: /home/{{ ansible_user }}/.kube/config
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "u=rw,g=,o="
+  tags: [masters, master]

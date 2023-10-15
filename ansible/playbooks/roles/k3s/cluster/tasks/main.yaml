@@ -1,35 +1,43 @@
-- set_fact:
-    key_value:
-      deviceType: "{{ hostvars[item]['vars']['node_type'] }}"
-  when: ("orangepi" in group_names)
-
-- set_fact:
-    key_value:
-      deviceType: "{{ hostvars[item]['vars']['node_type'] }}-{{ hostvars[item]['vars']['node_version'] }}"
-  when: ("raspberry" in group_names)
-
-- name: Configure roles
-  shell: |
-    kubectl label nodes {{ hostvars[item]['var_hostname'] }} kubernetes.io/role=worker
-    kubectl label nodes {{ hostvars[item]['var_hostname'] }} node-type=worker
-    kubectl label nodes {{ hostvars[item]['var_hostname'] }} device-type={{ deviceType }}
-  with_items:
-    - "{{ groups['workers'] }}"
-
-- name: Install kube-vip cloud controller
-  # kubectl
-  kubernetes.core.k8s:
+- name: Install python-kubernetes
+  apt:
+    name: python3-kubernetes
     state: present
-    src: https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
+  tags: [cluster, masters]
 
-- name: Configure global CIDR for kube-vip
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: ConfigMap
-      metadata:
-        name: kube-vip-config
-        namespace: kube-system
-      data:
-        cidr-global: 192.168.200.0/24
+- name: Run everything as {{ ansible_ssh_user }}
+  become: true
+  become_user: "{{ ansible_ssh_user }}"
+  tags: [cluster, masters]
+  block:
+    - name: Add node k8s label
+      kubernetes.core.k8s:
+        state: patched
+        kind: Node
+        name: "{{ hostvars[item]['vars']['node_name'] }}"
+        definition:
+          metadata:
+            labels:
+              device-type: "{{ hostvars[item]['node_type'] }}"
+              device-version: "{{ ('node_version' in hostvars[item]['vars']) | ternary(hostvars[item]['vars']['node_version'], omit) }}"
+              node-type: "{{ ('masters' in hostvars[item]['group_names']) | ternary('master', 'worker') }}"
+      loop: "{{ query('inventory_hostnames', 'orangepi,raspberry') }}"
+      tags: [cluster, masters, labels]
+
+    - name: Install kube-vip cloud controller
+      kubernetes.core.k8s:
+        state: present
+        src: https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
+      tags: [cluster, masters,vip-controller]
+
+    - name: Configure global CIDR for kube-vip
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: kube-vip-config
+            namespace: kube-system
+          data:
+            cidr-global: 192.168.200.0/24
+      tags: [cluster, masters,vip-controller]
