@@ -4,24 +4,38 @@
     name: network-manager
     state: present
 
+- name: Check if the connection name is "Wired connection 1"
+  shell: nmcli connection show "Wired connection 1" | grep "connection.id"
+  register: connection_name
+  changed_when: false
+  failed_when: false
+  when: ("orangepi" in group_names)
+
+- name: Rename current connection (orangepi)
+  shell: nmcli connection modify "Wired connection 1" connection.id "{{ ansible_default_ipv4.interface }}"
+  when: ("orangepi" in group_names) and connection_name.stdout != ""
+
 - name: Configure static ip through NetworkManager
   nmcli:
-    conn_name: eth0
+    conn_name: "{{ ansible_default_ipv4.interface }}"
     type: ethernet
     ip4: "{{ hostvars[inventory_hostname]['vars']['static_ip'] }}"
     gw4: "{{ hostvars[inventory_hostname]['vars']['static_gw'] }}"
+    dns4:
+      - 8.8.8.8
+      - 8.8.4.4
     state: present
     autoconnect: yes
+  when: ("raspberry" in group_names)
 
 - name: Configure static ip v6 through NetworkManager
   nmcli:
-      conn_name: eth0
       type: ethernet
       ip6: "{{ hostvars[inventory_hostname]['vars']['static_ip_v6'] }}"
       gw6: "{{ hostvars[inventory_hostname]['vars']['static_gw_v6'] }}"
       state: present
       autoconnect: yes
-  when: hostvars[inventory_hostname]['vars']['static_ip_v6'] is defined and hostvars[inventory_hostname]['vars']['static_gw_v6'] is defined
+  when: ("raspberry" in group_names) and hostvars[inventory_hostname]['vars']['static_ip_v6'] is defined and hostvars[inventory_hostname]['vars']['static_gw_v6'] is defined
 
 - name: Enable Network Manager
   service:

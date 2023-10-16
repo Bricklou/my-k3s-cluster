@@ -15,6 +15,15 @@
     state: reset
   tags: [firewall]
 
+- name: Allow all from localhost
+  ufw:
+    rule: allow
+    from_ip: "{{ item }}"
+  tags: [firewall]
+  with_items:
+    - 127.0.0.1/32
+    - ::1/128
+
 - name: Allow OpenSSH coming from local network
   ufw:
     rule: allow
@@ -41,6 +50,16 @@
   with_nested:
     - "{{ firewall_allowed_local_ips }}"
     - [2379, 2380, 6443, 10250]
+
+
+- name: Allow all from k3s cluster internal network
+  ufw:
+    rule: allow
+    from_ip: "{{ item }}"
+  tags: [firewall]
+  with_items:
+    - 10.42.0.0/16
+    - 10.43.0.0/16
 
 - name: Allow VPN
   ufw:
