@@ -27,3 +27,9 @@
     path: /home/{{ ansible_user }}/get_helm.sh
     state: absent
   tags: [helm, masters, master]
+
+- name: Install helm-diff
+  kubernetes.core.helm_plugin:
+    plugin_path: https://github.com/databus23/helm-diff
+    state: present
+  tags: [helm, masters, master]

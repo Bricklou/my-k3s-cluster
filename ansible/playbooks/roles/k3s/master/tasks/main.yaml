@@ -99,3 +99,11 @@
     group: "{{ ansible_user }}"
     mode: "u=rw,g=,o="
   tags: [masters, master]
+
+- name: Wait for VIP address to be ready
+  wait_for:
+      host: "{{ kube_vip_address }}"
+      port: 6443
+      delay: 10
+      timeout: 600
+  tags: [masters, master]

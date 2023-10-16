@@ -71,3 +71,13 @@
     owner: root
     group: root
     mode: 0755
+
+- name: Check if k3s binary exists
+  stat:
+    path: /usr/local/bin/k3s
+  register: k3s_binary
+
+- name: Fail if k3s binary does not exist
+  fail:
+    msg: "k3s binary does not exist"
+  when: not k3s_binary.stat.exists
