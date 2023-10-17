@@ -1,0 +1,19 @@
+---
+- name: Create longhorn UI service
+  kubernetes.core.k8s:
+    state: present
+    api_version: v1
+    kind: Service
+    definition:
+      metadata:
+        name: longhorn-ingress-lb
+        namespace: longhorn-system
+      spec:
+        selector:
+          app: longhorn-ui
+        type: LoadBalancer
+        loadBalancerIP: "{{ kube_vip_address }}"
+        ports:
+          - name: longhorn-ui-port
+            protocol: TCP
+            port: 80

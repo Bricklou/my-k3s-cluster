@@ -1,0 +1,31 @@
+- hosts: all
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: Install required packages for longhorn
+      apt:
+        pkg:
+          - nfs-common
+          - open-iscsi
+          - util-linux
+        update_cache: yes
+        state: present
+    - name: Enable iscsid service
+      service:
+        name: iscsid
+        enabled: yes
+        state: started
+#    - name: Enable iscsi_tcp modprobe
+#      modprobe:
+#        name: iscsi_tcp
+#        state: present
+  tags:
+    - storage
+
+- hosts: masters
+  gather_facts: yes
+  roles:
+    - name: k3s-deployment/storage
+      tags: storage
+    - name: k3s-deployment/storage-ui
+      tags: storage-ui
