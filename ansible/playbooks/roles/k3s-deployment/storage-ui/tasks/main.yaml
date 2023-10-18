@@ -12,8 +12,9 @@
         selector:
           app: longhorn-ui
         type: LoadBalancer
-        loadBalancerIP: "{{ kube_vip_address }}"
         ports:
           - name: longhorn-ui-port
             protocol: TCP
             port: 80
+            targetNode: 80
+            nodePort: 32080

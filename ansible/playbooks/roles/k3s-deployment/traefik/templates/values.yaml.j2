@@ -1,0 +1,105 @@
+# https://traefik.io/blog/install-and-configure-traefik-with-helm/
+# see https://doc.traefik.io/traefik/https/acme/#providers
+# https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
+additionalArguments:
+  - --entryPoints.web.forwardedHeaders.trustedIPs=127.0.0.1/32,192.168.0.1/16
+  - --entryPoints.websecure.forwardedHeaders.trustedIPs=127.0.0.1/32,192.168.0.1/16
+
+  - --entryPoints.web.proxyProtocol.trustedIPs=127.0.0.1/32,192.168.0.1/16
+  - --entryPoints.websecure.proxyProtocol.trustedIPs=127.0.0.1/32,192.168.0.1/16
+  #- --certificatesresolvers.ovh.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+  # comment the line above when going to production
+
+# Logging configuration
+logs:
+  general:
+    level: DEBUG
+
+certResolvers:
+  ovh:
+    email: {{ dns_challenge_email }}
+    dnsChallenge:
+      provider: ovh
+      delayBeforeCheck: 5
+      resolvers:
+        - 1.1.1.1
+        - 8.8.8.8
+    storage: /certs/acme.json
+
+ingressRoute:
+  dashboard:
+    enabled: false
+
+persistence:
+  enabled: true
+  # make sure this claim existed
+  existingClaim: acme-json-certs
+  accessMode: ReadWriteOnce
+  size: 128Mi
+  name: certs
+  path: /certs
+
+deployment:
+  initContainers:
+    - name: volume-permissions
+      image: busybox:1.31.1
+      command: ["sh", "-c", "chmod -Rv 600 /certs/*"]
+      volumeMounts:
+        - name: certs
+          mountPath: /certs
+
+volumes:
+  - mountPath: /data
+    name: traefik-config
+    type: configMap
+
+# without this, ingress get stuck on initializing
+providers:
+  file:
+    filename: /data/traefik-config.yaml
+  kubernetesIngress:
+    ingressClass: traefik-internal
+
+# Port configuration
+ports:
+  web:
+    port: 8080
+    expose: true
+    exposedPort: 80
+
+  websecure:
+    port: 8443
+    expose: true
+    exposedPort: 443
+    tls:
+      enabled: true
+      certResolver: ovh
+      domains:
+        - main: "{{ domain_main }}"
+          sans: ["{{ domain_sans }}"]
+        - main: "{{ domain_main2 }}"
+          sans: ["{{ domain_sans2 }}"]
+
+# Environment configuration
+env:
+  - name: OVH_ENDPOINT
+    valueFrom:
+      secretKeyRef:
+        key: ovhEndpoint
+        name: ovh-apikey-secret
+
+  - name: OVH_APPLICATION_KEY
+    valueFrom:
+      secretKeyRef:
+        key: ovhApplicationKey
+        name: ovh-apikey-secret
+  - name: OVH_APPLICATION_SECRET
+    valueFrom:
+      secretKeyRef:
+        key: ovhApplicationSecret
+        name: ovh-apikey-secret
+  - name: OVH_CONSUMER_KEY
+    valueFrom:
+      secretKeyRef:
+        key: ovhConsumerKey
+        name: ovh-apikey-secret

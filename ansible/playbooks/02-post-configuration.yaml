@@ -27,5 +27,7 @@
   roles:
     - name: k3s-deployment/storage
       tags: storage
+    - name: k3s-deployment/traefik
+      tags: traefik
     - name: k3s-deployment/storage-ui
       tags: storage-ui
