@@ -8,8 +8,9 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`192.168.1.208`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
+    - match: Host(`192.168.1.208`) && PathPrefix(`/dashboard/`, `/api`)
       kind: Rule
       services:
         - name: api@internal
+          port: 8080
           kind: TraefikService

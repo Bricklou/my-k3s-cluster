@@ -40,6 +40,11 @@
         state: present
       tags: [cluster, masters, metallb]
 
+    - name: Wait few seconds
+      pause:
+          seconds: 30
+      tags: [cluster, masters, metallb]
+
     - name: Apply MetalLB configuration
       kubernetes.core.k8s:
         state: present

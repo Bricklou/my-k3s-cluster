@@ -1,0 +1,29 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: longhorn-stripprefix
+  namespace: longhorn-system
+spec:
+  stripPrefix:
+    prefixes:
+      - /storage
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: longhorn-ingress
+  namespace: longhorn-system
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`192.168.1.208`) && PathPrefix(`/storage/`)
+      kind: Rule
+      services:
+        - name: longhorn-frontend
+          port: 80
+          kind: Service
+      middlewares:
+        - name: longhorn-stripprefix

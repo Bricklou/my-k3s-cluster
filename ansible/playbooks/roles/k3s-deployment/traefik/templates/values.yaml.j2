@@ -7,6 +7,7 @@ additionalArguments:
 
   - --entryPoints.web.proxyProtocol.trustedIPs=127.0.0.1/32,192.168.0.1/16
   - --entryPoints.websecure.proxyProtocol.trustedIPs=127.0.0.1/32,192.168.0.1/16
+  - --api.dashboard=true
   #- --certificatesresolvers.ovh.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
   # comment the line above when going to production
 
@@ -22,8 +23,9 @@ certResolvers:
       provider: ovh
       delayBeforeCheck: 5
       resolvers:
-        - 1.1.1.1
         - 8.8.8.8
+        - 8.8.4.4
+        - 1.1.1.1
     storage: /certs/acme.json
 
 ingressRoute:
@@ -42,8 +44,12 @@ persistence:
 deployment:
   initContainers:
     - name: volume-permissions
-      image: busybox:1.31.1
-      command: ["sh", "-c", "chmod -Rv 600 /certs/*"]
+      image: busybox:latest
+      command: ["sh", "-c", "touch /certs/acme.json; chmod -v 600 /certs/acme.json"]
+      securityContext:
+        runAsNonRoot: true
+        runAsGroup: 65532
+        runAsUser: 65532
       volumeMounts:
         - name: certs
           mountPath: /certs
@@ -103,3 +109,10 @@ env:
       secretKeyRef:
         key: ovhConsumerKey
         name: ovh-apikey-secret
+
+# Service configuration
+service:
+  enabled: true
+  annotations:
+    metallb.universe.tf/address-pool: "lb-pool"
+    metallb.universe.tf/allow-shared-ip: "public-ip"

@@ -2,19 +2,5 @@
 - name: Create longhorn UI service
   kubernetes.core.k8s:
     state: present
-    api_version: v1
-    kind: Service
-    definition:
-      metadata:
-        name: longhorn-ingress-lb
-        namespace: longhorn-system
-      spec:
-        selector:
-          app: longhorn-ui
-        type: LoadBalancer
-        ports:
-          - name: longhorn-ui-port
-            protocol: TCP
-            port: 80
-            targetNode: 80
-            nodePort: 32080
+    template:
+      path: "longhorn-ingress.yaml"
