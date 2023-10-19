@@ -1,0 +1,9 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: cheap
+  namespace: metallb-system
+spec:
+  addresses:
+    - 192.168.1.208/28
+    - 2a01:cb10:047f:af00:83df:5930:ffff:0001/112

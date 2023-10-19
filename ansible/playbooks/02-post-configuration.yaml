@@ -1,29 +1,25 @@
 - hosts: all
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   tasks:
     - name: Install required packages for longhorn
-      apt:
+      ansible.builtin.apt:
         pkg:
           - nfs-common
           - open-iscsi
           - util-linux
-        update_cache: yes
+        update_cache: true
         state: present
     - name: Enable iscsid service
-      service:
+      ansible.builtin.service:
         name: iscsid
-        enabled: yes
+        enabled: true
         state: started
-#    - name: Enable iscsi_tcp modprobe
-#      modprobe:
-#        name: iscsi_tcp
-#        state: present
   tags:
     - storage
 
 - hosts: masters
-  gather_facts: yes
+  gather_facts: true
   roles:
     - name: k3s-deployment/storage
       tags: storage

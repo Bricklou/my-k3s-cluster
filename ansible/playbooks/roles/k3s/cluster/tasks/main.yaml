@@ -23,21 +23,26 @@
       loop: "{{ query('inventory_hostnames', 'orangepi,raspberry') }}"
       tags: [cluster, masters, labels]
 
-    - name: Install kube-vip cloud controller
-      kubernetes.core.k8s:
+    - name: Add metallb to helm repos
+      kubernetes.core.helm_repository:
+        repo_name: metallb
+        repo_url: https://metallb.github.io/metallb
         state: present
-        src: https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
-      tags: [cluster, masters,vip-controller]
+      tags: [cluster, masters, metallb]
 
-    - name: Configure global CIDR for kube-vip
+    - name: Install metallb from helm
+      kubernetes.core.helm:
+        name: metallb
+        chart_ref: metallb/metallb
+        namespace: metallb-system
+        create_namespace: yes
+        update_repo_cache: yes
+        state: present
+      tags: [cluster, masters, metallb]
+
+    - name: Apply MetalLB configuration
       kubernetes.core.k8s:
         state: present
-        definition:
-          apiVersion: v1
-          kind: ConfigMap
-          metadata:
-            name: kubevip
-            namespace: kube-system
-          data:
-            cidr-global: 192.168.200.0/24
-      tags: [cluster, masters,vip-controller]
+        template:
+          path: "values.yaml"
+      tags: [cluster, masters, metallb]
