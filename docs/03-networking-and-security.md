@@ -5,6 +5,7 @@
 ### Expose services
 
 For my personal use, I only needs to expose these services from anywhere on the Internet:
+
 - http/https
 - ssh
 - vpn
@@ -14,16 +15,21 @@ This way, I only need to expose the minimum required: http/https and vpn ports.
 
 ### Internal network
 
-To manage my cluster internal network, I will work with [Kube-VIP](https://kube-vip.io/), a load balancer for Kubernetes clusters.
+To manage my cluster internal network, I will work with [MetalLB](https://metallb.universe.tf/), a load balancer for Kubernetes clusters.
 It will help me to manage the internal network and the load balancing between the nodes.
 
-Some explanation video: https://youtu.be/NslXSagv3mU
+I will also use [Kube-VIP](https://kube-vip.io) to load balance the Kubernetes control plane.
+
+::note
+Take note that MetalLB need to be configured with a pool of IP addresses to use. This pool must be in the same subnet as the nodes IP addresses. (ex: the node address is 192.168.1.7/24, the range need to be
+_at least_ in the range 192.168.1.1/24, but it could be 192.168.1.208/28 in example).
+::
 
 ### VPN
 
 To configure my VPN, I will obviously use OpenVPN, but, I recently discovered ovpn-admin, a web interface to manage OpenVPN.
 It seems to be a very nice tool, so I will use it to manage all my configurations.
-*More details available here: https://linuxiac.com/openvpn-ui-ovpn-admin*
+_More details available here: https://linuxiac.com/openvpn-ui-ovpn-admin_
 
 ## Security
 

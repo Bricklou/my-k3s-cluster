@@ -1,11 +1,11 @@
 ---
 - name: Read node-token from master
-  slurp:
+  ansible.builtin.slurp:
     src: /var/lib/rancher/k3s/server/agent-token
   register: node_token
   tags: [workers]
 
 - name: Store Master node-token
-  set_fact:
+  ansible.builtin.set_fact:
     main_token: "{{ node_token.content | b64decode | regex_replace('\n', '') }}"
   tags: [workers]

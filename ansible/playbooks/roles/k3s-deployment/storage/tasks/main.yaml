@@ -7,8 +7,8 @@
 
 - name: If the storage folder exists, delete it
   file:
-      path: "{{ item[1] }}"
-      state: absent
+    path: "{{ item[1] }}"
+    state: absent
   become: yes
   delegate_to: "{{ item[0] }}"
   run_once: true
@@ -50,4 +50,6 @@
     values:
       defaultSettings:
         defaultDataPath: /storage
+        persistence:
+          defaultClassReplicaCount: 1
   run_once: true

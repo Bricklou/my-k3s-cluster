@@ -1,7 +1,7 @@
 ---
 - hosts: all
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   roles:
     - k3s/download
   tags:
@@ -9,16 +9,16 @@
     - masters
 
 - hosts: raspberry
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   roles:
     - role: k3s/raspberry
   tags:
     - raspberry
 
 - hosts: masters
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   roles:
     - name: k3s/kube-vip
       tags: [masters, kube-vip]
@@ -28,24 +28,24 @@
     - masters
 
 - hosts: masters
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   roles:
     - k3s/fetch-token
   tags:
     - workers
 
 - hosts: workers
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   roles:
     - k3s/worker
   tags:
     - workers
 
 - hosts: masters
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   roles:
     - name: k3s/cluster
       when: ansible_host == hostvars[groups['masters'][0]]['ansible_host']

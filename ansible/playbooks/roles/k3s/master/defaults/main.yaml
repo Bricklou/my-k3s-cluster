@@ -1,4 +1,13 @@
 ---
 k3s_server_location: /var/lib/rancher/k3s
-master_ip: "{{ hostvars[groups['masters'][0]]['ansible_host'] | default(groups['masters'][0]) }}"
-common_server_init_args: --tls-san {{ kube_vip_address }} --disable servicelb --disable traefik {{ extra_server_args | default('') }}
+main_master_node: "{{ hostvars[groups['masters'][0]]['ansible_host'] | default(groups['masters'][0]) }}"
+master_ip: "{{ kube_vip_address }}"
+common_server_init_args: \
+  --cluster-cidr=10.42.0.0/16,2001:cafe:42:0::/56 \
+  --service-cidr=10.43.0.0/16,2001:cafe:42:1::/112 \
+  --flannel-ipv6-masq=true \
+  --kubelet-arg="node-ip=0.0.0.0" \
+  --tls-san {{ kube_vip_address }} \
+  --disable servicelb \
+  --disable traefik \
+  {{ extra_server_args | default('') }}

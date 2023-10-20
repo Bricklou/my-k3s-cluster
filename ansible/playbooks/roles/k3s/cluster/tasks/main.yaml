@@ -38,11 +38,14 @@
         create_namespace: yes
         update_repo_cache: yes
         state: present
+        wait: true
       tags: [cluster, masters, metallb]
 
-    - name: Wait few seconds
-      pause:
-          seconds: 30
+    - name: Wait for metallb to be ready
+      command: kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=metallb -n metallb-system --timeout=600s
+      register: result
+      # fail when return code is not 0
+      failed_when: result.rc != 0
       tags: [cluster, masters, metallb]
 
     - name: Apply MetalLB configuration

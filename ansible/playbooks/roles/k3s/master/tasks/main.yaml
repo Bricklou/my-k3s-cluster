@@ -18,8 +18,8 @@
   tags: [masters, master]
 
 - name: Prepare main master
-  tags: [ masters, master ]
-  when: ansible_host == master_ip
+  tags: [masters, master]
+  when: ansible_host == main_master_node
   block:
     - name: Start k3s service (main master init)
       include_tasks: k3s-init.yaml
@@ -29,11 +29,11 @@
 
     - name: Wait for k3s-init to finish
       wait_for:
-          path: "{{ k3s_server_location }}/server/node-token"
+        path: "{{ k3s_server_location }}/server/node-token"
 
     - name: Register node-token file access mode
       stat:
-          path: /var/lib/rancher/k3s/server
+        path: /var/lib/rancher/k3s/server
       register: p
 
     - name: Change file access node-token
@@ -58,7 +58,7 @@
         mode: "{{ p.stat.mode }}"
 
 - name: Start k3s service (others masters)
-  when: ansible_host != master_ip
+  when: ansible_host != main_master_node
   tags: [masters, master]
   block:
     - name: Start k3s service (others masters init)
@@ -102,8 +102,8 @@
 
 - name: Wait for VIP address to be ready
   wait_for:
-      host: "{{ kube_vip_address }}"
-      port: 6443
-      delay: 10
-      timeout: 600
+    host: "{{ kube_vip_address }}"
+    port: 6443
+    delay: 10
+    timeout: 600
   tags: [masters, master]

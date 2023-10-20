@@ -30,11 +30,11 @@
 
 - name: Configure static ip v6 through NetworkManager
   nmcli:
-      type: ethernet
-      ip6: "{{ hostvars[inventory_hostname]['vars']['static_ip_v6'] }}"
-      gw6: "{{ hostvars[inventory_hostname]['vars']['static_gw_v6'] }}"
-      state: present
-      autoconnect: yes
+    type: ethernet
+    ip6: "{{ hostvars[inventory_hostname]['vars']['static_ip_v6'] }}"
+    gw6: "{{ hostvars[inventory_hostname]['vars']['static_gw_v6'] }}"
+    state: present
+    autoconnect: yes
   when: ("raspberry" in group_names) and hostvars[inventory_hostname]['vars']['static_ip_v6'] is defined and hostvars[inventory_hostname]['vars']['static_gw_v6'] is defined
 
 - name: Enable Network Manager
@@ -42,3 +42,6 @@
     name: NetworkManager
     enabled: yes
     state: restarted
+
+- name: Allow router advertisement for IPv6
+  shell: sysctl -w net.ipv6.conf.all.accept_ra=2 >> /etc/sysctl.conf
