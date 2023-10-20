@@ -1,4 +1,4 @@
 ---
 k3s_server_location: /var/lib/rancher/k3s
 master_ip: "{{ hostvars[groups['masters'][0]]['ansible_host'] | default(groups['masters'][0]) }}"
-common_server_init_args: --tls-san {{ kube_vip_address }} --disable servicelb --disable traefik --kube-apiserver-arg 'service-node-port-range=1-65535' {{ extra_server_args | default('') }}
+common_server_init_args: --tls-san {{ kube_vip_address }} --disable servicelb --disable traefik {{ extra_server_args | default('') }}
