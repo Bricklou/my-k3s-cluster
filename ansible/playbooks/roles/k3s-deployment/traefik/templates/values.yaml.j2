@@ -116,3 +116,8 @@ service:
   annotations:
     metallb.universe.tf/address-pool: "lb-pool"
     metallb.universe.tf/allow-shared-ip: "public-ip"
+  spec:
+    ipFamilyPolicy: PreferDualStack
+    ipFamilies:
+      - IPv4
+      - IPv6

@@ -1,5 +1,5 @@
 - name: Install python-kubernetes
-  apt:
+  ansible.builtin.apt:
     name: python3-kubernetes
     state: present
   tags: [cluster, masters]
@@ -35,15 +35,16 @@
         name: metallb
         chart_ref: metallb/metallb
         namespace: metallb-system
-        create_namespace: yes
-        update_repo_cache: yes
+        create_namespace: true
+        update_repo_cache: true
         state: present
         wait: true
       tags: [cluster, masters, metallb]
 
     - name: Wait for metallb to be ready
-      command: kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=metallb -n metallb-system --timeout=600s
+      ansible.builtin.command: kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=metallb -n metallb-system --timeout=600s
       register: result
+      changed_when: result.rc != 0
       # fail when return code is not 0
       failed_when: result.rc != 0
       tags: [cluster, masters, metallb]

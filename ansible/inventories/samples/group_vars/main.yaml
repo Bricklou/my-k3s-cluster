@@ -20,3 +20,23 @@ local_ssh_key: '/home/user/.ssh/id_rsa.pub'
 
 firewall_allowed_local_ips:
   - 192.168.1.0/16
+
+
+kube_vip_address: 192.168.1.200
+kube_cidr_address: 192.168.1.202/29
+
+ovh_endpoint: ovh-eu
+ovh_application_key: somekey
+ovh_application_secret: somesecret
+ovh_consumer_key: someconsumerkey
+dns_challenge_email: someemail
+
+domain_main: #domain
+domain_sans: #*.domain
+
+domain_main2: #domain
+domain_sans2: #*.domain
+
+metallb_pool_addresses:
+  - # put your public ipv6 here, I personally use a /112
+  - 192.168.1.208/28
