@@ -1,0 +1,13 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgres-cluster
+  namespace: cnpg-system
+spec:
+  instances: 1
+  enableSuperuserAccess: true
+
+  storage:
+    size: 5Gi
+
