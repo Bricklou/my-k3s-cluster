@@ -1,0 +1,31 @@
+---
+# Redirect to https
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: wireguard-stripeprefix
+  namespace: wireguard
+spec:
+  stripPrefix:
+    prefixes:
+      - /wireguard/
+    forceSlash: true
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: wireguard-ingress
+  namespace: wireguard
+
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`192.168.1.208`) && PathPrefix(`/wireguard`)
+      kind: Rule
+      services:
+        - name: wireguard-admin
+          port: wireguard-admin
+      middlewares:
+        - name: wireguard-stripeprefix

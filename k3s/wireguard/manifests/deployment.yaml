@@ -1,0 +1,54 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wireguard-deployment
+  namespace: wireguard
+  labels:
+    app: wireguard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wireguard
+  template:
+    metadata:
+      labels:
+        app: wireguard
+    spec:
+      hostname: wireguard
+      containers:
+        - name: wireguard
+          image: weejewel/wg-easy:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 51820
+              name: wireguard
+              protocol: UDP
+            - containerPort: 51821
+              name: wireguard-admin
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: wireguard-config
+            - secretRef:
+                name: wireguard-secrets
+          volumeMounts:
+            - mountPath: /etc/wireguard
+              name: wireguard-data
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            capabilities:
+                add:
+                  - NET_ADMIN
+                  - SYS_MODULE
+      volumes:
+        - name: wireguard-data
+          persistentVolumeClaim:
+            claimName: wireguard-data

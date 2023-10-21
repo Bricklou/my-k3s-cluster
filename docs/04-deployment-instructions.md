@@ -15,28 +15,28 @@ To deploy an application, we need to use the `kubectl apply` command with the `-
 file to use.
 
 ```shell
-kubectl apply -f ./k3s/openvpn
+kubectl apply -f ./k3s/wireguard
 ```
 
 This command will deploy the OpenVPN server on our cluster. To access it, we need to retrieve the IP address of the
 service. To do so, we can use the `kubectl get` command with the `-o wide` flag to get more details about the service.
 
 ```shell
-kubectl get service openvpn -o wide
+kubectl get service wireguard -o wide
 ```
 
 This command will return something like this:
 
 ```shell
 NAME      TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE   SELECTOR
-openvpn   LoadBalancer   10.43.117.209                 1194:30000/TCP 2d    app=openvpn
+wireguard   LoadBalancer   10.43.117.209                 1194:30000/TCP 2d    app=wireguard
 ```
 
 To delete an application, we can use the `kubectl delete` command with the `-f` flag to specify the configuration
 file to use.
 
 ```shell
-kubectl delete -f ./k3s/openvpn
+kubectl delete -f ./k3s/wireguard
 ```
 
 This should be enough to deploy and manage our applications on our cluster.

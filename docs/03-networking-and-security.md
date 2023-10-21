@@ -26,9 +26,8 @@ I will also use [Kube-VIP](https://kube-vip.io) to load balance the Kubernetes c
 
 ### VPN
 
-To configure my VPN, I will obviously use OpenVPN, but, I recently discovered ovpn-admin, a web interface to manage OpenVPN.
+To configure my VPN, I will use WireGuard with a web interface called [wg-easy](https://github.com/wg-easy/wg-easy) to manage it.
 It seems to be a very nice tool, so I will use it to manage all my configurations.
-_More details available here: https://linuxiac.com/openvpn-ui-ovpn-admin_
 
 ## Security
 
