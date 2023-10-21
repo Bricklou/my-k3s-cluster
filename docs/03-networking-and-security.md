@@ -20,10 +20,9 @@ It will help me to manage the internal network and the load balancing between th
 
 I will also use [Kube-VIP](https://kube-vip.io) to load balance the Kubernetes control plane.
 
-::note
-Take note that MetalLB need to be configured with a pool of IP addresses to use. This pool must be in the same subnet as the nodes IP addresses. (ex: the node address is 192.168.1.7/24, the range need to be
-_at least_ in the range 192.168.1.1/24, but it could be 192.168.1.208/28 in example).
-::
+> **Note**
+> Take note that MetalLB need to be configured with a pool of IP addresses to use. This pool must be in the same subnet as the nodes IP addresses. (ex: the node address is 192.168.1.7/24, the range need to be
+> _at least_ in the range 192.168.1.1/24, but it could be 192.168.1.208/28 in example).
 
 ### VPN
 
