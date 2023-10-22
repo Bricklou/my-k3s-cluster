@@ -9,10 +9,6 @@ an open-source Kubernetes operator designed to manage PostgreSQL workloads on an
 It covers the full lifecycle of a highly available PostgreSQL database cluster with a primary/standby architecture, using
 native streaming replication.
 
-On top of that (or rather, on the side of that), we will use PostgreSQL Operator, which is a Kubernetes operator for
-PostgreSQL clusters. It provides a declarative configuration for deploying and managing PostgreSQL clusters on Kubernetes.
-With that, we will be able to manage users, roles and databases through Kubernetes resources. Which is pretty cool!
-
 ## Deploy CNPG
 
 First, we need to deploy CNPG. To do so, we will use the Helm chart provided by the CNPG team.
@@ -28,28 +24,6 @@ Then, we will create a namespace for CNPG and deploy it.
 helm upgrade --install cnpg \
   --namespace cnpg-system \
   --create-namespace \
-  --values ../k3s/database/cloudnative-pg/values.yaml \
+  --values ../k3s/cloudnative-pg/values.yaml \
   cnpg/cloudnative-pg
-```
-
-And finally, create a cluster with:
-
-```shell
-kubectl apply -f ../k3s/database/cloudnative-pg/cluster.yaml
-```
-
-## Deploy PostgreSQL Operator
-
-Now that we have CNPG deployed, we can deploy PostgreSQL Operator. To do so, we will use the Helm chart provided by the
-PostgreSQL Operator team.
-
-```shell
-helm repo add ext-postgres-operator https://movetokube.github.io/postgres-operator/
-helm repo update
-```
-
-Then, we will create a namespace for PostgreSQL Operator and deploy it.
-
-```shell
-helm upgrade --install -n operators ext-postgres-operator  ext-postgres-operator/ext-postgres-operator
 ```

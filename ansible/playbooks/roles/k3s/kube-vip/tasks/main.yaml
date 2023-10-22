@@ -3,7 +3,7 @@
   include_tasks: ./clean.yaml
   tags: [masters, kube-vip]
 
-- name: Create manifest directory
+- name: Create manifests directory
   file:
     path: "{{ k3s_server_location }}/server/manifests"
     state: directory
@@ -12,7 +12,7 @@
     mode: "u=rwx,g=rx,o="
   tags: [masters, kube-vip]
 
-- name: Download kube-vip RBAC manifest
+- name: Download kube-vip RBAC manifests
   get_url:
       url: https://kube-vip.io/manifests/rbac.yaml
       dest: "{{ k3s_server_location }}/server/manifests/kube-vip-rbac.yaml"
@@ -21,9 +21,9 @@
       mode: "u=rwx,g=rx,o="
   tags: [masters, kube-vip]
 
-- name: Generate kube-vip manifest
+- name: Generate kube-vip manifests
   template:
-    src: kube-vip-manifest.yaml.j2
+    src: kube-vip-manifests.yaml.j2
     dest: "{{ k3s_server_location }}/server/manifests/kube-vip.yaml"
     owner: root
     group: root
