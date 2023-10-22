@@ -1,0 +1,80 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plausible
+  namespace: plausible
+  labels:
+    app: plausible
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: plausible
+  template:
+    metadata:
+      labels:
+        app: plausible
+    spec:
+      initContainers:
+        - name: wait-for-db
+          image: busybox
+          command: [ "sh", "-c", "until nslookup plausible-cluster-rw.plausible.svc.cluster.local; do echo waiting for database; sleep 2; done" ]
+        - name: wait-for-clickhouse
+          image: busybox
+          command: [ "sh", "-c", "until wget --no-verbose --tries=1 --spider http://plausible-clickhouse.plausible.svc.cluster.local:8123/ping; do echo waiting for clickhouse; sleep 2; done" ]
+      containers:
+        - name: plausible
+          image: plausible/analytics:v2.0
+          command: [ "sh", "-c", "/entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh run" ]
+          ports:
+            - containerPort: 8000
+              name: plausible
+          envFrom:
+            - secretRef:
+                name: plausible-secrets
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  key: uri
+                  name: plausible-cluster-app
+            - name: CLICKHOUSE_DATABASE_URL
+              value: "http://plausible-clickhouse:8123/plausible"
+          resources:
+            limits:
+              cpu: 500m
+              memory: 500Mi
+            requests:
+              cpu: 500m
+              memory: 500Mi
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8000
+            initialDelaySeconds: 90
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8000
+            initialDelaySeconds: 90
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plausible
+  namespace: plausible
+spec:
+  selector:
+    app: plausible
+  ports:
+    - name: plausible
+      port: 80
+      targetPort: 8000

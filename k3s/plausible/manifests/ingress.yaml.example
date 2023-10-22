@@ -1,0 +1,17 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: plausible-ingress
+  namespace: plausible
+
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - match: Host(`some-host.com`)
+      kind: Rule
+      services:
+        - name: plausible
+          port: plausible

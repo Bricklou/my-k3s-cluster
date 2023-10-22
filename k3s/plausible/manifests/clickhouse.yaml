@@ -1,0 +1,108 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clickhouse-config
+  namespace: plausible
+data:
+  clickhouse-config.xml: |
+    <clickhouse>
+        <listen_host>0.0.0.0</listen_host>
+        <logger>
+            <level>warning</level>
+            <console>true</console>
+        </logger>
+        
+        <!-- Stop all the unnecessary logging -->
+        <query_thread_log remove="remove"/>
+        <query_log remove="remove"/>
+        <text_log remove="remove"/>
+        <trace_log remove="remove"/>
+        <metric_log remove="remove"/>
+        <asynchronous_metric_log remove="remove"/>
+        <session_log remove="remove"/>
+        <part_log remove="remove"/>
+    </clickhouse>
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clickhouse-user-config
+  namespace: plausible
+data:
+  clickhouse-user-config.xml: |
+    <clickhouse>
+        <profiles>
+            <default>
+                <log_queries>0</log_queries>
+                <log_query_threads>0</log_query_threads>
+            </default>
+        </profiles>
+    </clickhouse>
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: plausible-clickhouse
+  namespace: plausible
+spec:
+  selector:
+    matchLabels:
+      app: plausible-clickhouse
+  replicas: 1
+  serviceName: plausible-clickhouse
+  template:
+    metadata:
+      labels:
+        app: plausible-clickhouse
+    spec:
+      containers:
+        - name: plausible-clickhouse
+          image: clickhouse/clickhouse-server:22.12-alpine
+          ports:
+            - containerPort: 8123
+              name: clickhouse
+          volumeMounts:
+            - name: clickhouse-data
+              mountPath: /var/lib/clickhouse
+            - name: clickhouse-config
+              mountPath: /etc/clickhouse-server/config.d/logging.xml
+              subPath: clickhouse-config.xml
+              readOnly: true
+            - name: clickhouse-user-config
+              mountPath: /etc/clickhouse-server/users.d/logging.xml
+              subPath: clickhouse-user-config.xml
+              readOnly: true
+          resources:
+            limits:
+              cpu: 500m
+              memory: 500Mi
+            requests:
+              cpu: 500m
+              memory: 500Mi
+      volumes:
+      - name: clickhouse-data
+        persistentVolumeClaim:
+          claimName: clickhouse-data
+      - name: clickhouse-config
+        configMap:
+          name: clickhouse-config
+      - name: clickhouse-user-config
+        configMap:
+          name: clickhouse-user-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plausible-clickhouse
+  namespace: plausible
+spec:
+  selector:
+    app: plausible-clickhouse
+  ports:
+  - port: 8123
+    targetPort: 8123
+    name: clickhouse
