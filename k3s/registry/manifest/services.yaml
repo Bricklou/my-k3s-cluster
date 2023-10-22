@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry-svc
+  namespace: registry
+  annotations:
+    metallb.universe.tf/address-pool: "lb-pool"
+    metallb.universe.tf/loadBalancerIPs: "192.168.1.210"
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http-registry
+      port: 5000
+  selector:
+    app: registry
