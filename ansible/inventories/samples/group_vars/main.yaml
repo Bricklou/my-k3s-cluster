@@ -29,7 +29,12 @@ ovh_endpoint: ovh-eu
 ovh_application_key: somekey
 ovh_application_secret: somesecret
 ovh_consumer_key: someconsumerkey
+
 dns_challenge_email: someemail
+
+cloudflare_api_email: # email
+cloudflare_api_key: # key
+
 
 domain_main: #domain
 domain_sans: #*.domain

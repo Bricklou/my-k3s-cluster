@@ -2,8 +2,8 @@
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: plausible-ingress
-  namespace: plausible
+  name: authentik-ingress
+  namespace: authentik
 
 spec:
   entryPoints:
@@ -13,5 +13,5 @@ spec:
     - match: Host(`some-host.com`)
       kind: Rule
       services:
-        - name: plausible
-          port: plausible
+        - name: authentik
+          port: http

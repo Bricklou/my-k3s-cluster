@@ -2,11 +2,11 @@
 # see https://doc.traefik.io/traefik/https/acme/#providers
 # https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
 additionalArguments:
-  - --entryPoints.web.forwardedHeaders.trustedIPs=127.0.0.1/32,192.168.0.1/16
-  - --entryPoints.websecure.forwardedHeaders.trustedIPs=127.0.0.1/32,192.168.0.1/16
+  - --entryPoints.web.forwardedHeaders.trustedIPs=127.0.0.1/32
+  - --entryPoints.websecure.forwardedHeaders.trustedIPs=127.0.0.1/32
 
-  - --entryPoints.web.proxyProtocol.trustedIPs=127.0.0.1/32,192.168.0.1/16
-  - --entryPoints.websecure.proxyProtocol.trustedIPs=127.0.0.1/32,192.168.0.1/16
+  - --entryPoints.web.proxyProtocol.trustedIPs=127.0.0.1/32,10.42.1.0/16,10.43.1.0/16,2001:cafe:42:2::/64
+  - --entryPoints.websecure.proxyProtocol.trustedIPs=127.0.0.1/32,10.42.1.0/16,10.43.1.0/16,2001:cafe:42:2::/64
   - --api.dashboard=true
   #- --certificatesresolvers.ovh.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
   # comment the line above when going to production
@@ -23,9 +23,20 @@ certResolvers:
       provider: ovh
       delayBeforeCheck: 5
       resolvers:
+        - 1.1.1.1
         - 8.8.8.8
         - 8.8.4.4
+    storage: /certs/acme.json
+
+  cloudflare:
+    email: {{ dns_challenge_email }}
+    dnsChallenge:
+      provider: cloudflare
+      delayBeforeCheck: 5
+      resolvers:
         - 1.1.1.1
+        - 8.8.8.8
+        - 8.8.4.4
     storage: /certs/acme.json
 
 ingressRoute:
@@ -83,11 +94,10 @@ ports:
       domains:
         - main: "{{ domain_main }}"
           sans: ["{{ domain_sans }}"]
-        - main: "{{ domain_main2 }}"
-          sans: ["{{ domain_sans2 }}"]
 
 # Environment configuration
 env:
+  # OVH API configuration
   - name: OVH_ENDPOINT
     valueFrom:
       secretKeyRef:
@@ -109,6 +119,21 @@ env:
       secretKeyRef:
         key: ovhConsumerKey
         name: ovh-apikey-secret
+
+  # Cloudflare API configuration
+  - name: CLOUDFLARE_API_KEY
+    valueFrom:
+      secretKeyRef:
+        key: cloudflareAPIKey
+        name: cloudflare-apikey-secret
+  - name: CLOUDFLARE_EMAIL
+    valueFrom:
+      secretKeyRef:
+        key: cloudflareEmail
+        name: cloudflare-apikey-secret
+
+  - name: LEGO_DISABLE_CNAME_SUPPORT
+    value: "true"
 
 # Service configuration
 service:

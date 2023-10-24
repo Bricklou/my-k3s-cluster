@@ -1,0 +1,59 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentik-worker
+  namespace: authentik
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authentik-worker
+  template:
+    metadata:
+      labels:
+        app: authentik-worker
+    spec:
+      containers:
+        - name:  authentik-worker
+          image: ghcr.io/goauthentik/server:2023.8.3
+          imagePullPolicy: Always
+          args: [ 'worker' ]
+          env:
+            - name: AUTHENTIK_REDIS__HOST
+              value: authentik-redis.authentik.svc.cluster.local
+            - name: AUTHENTIK_POSTGRESQL__HOST
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-cluster-app
+                  key: host
+            - name: AUTHENTIK_POSTGRESQL__USER
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-cluster-app
+                  key: username
+            - name: AUTHENTIK_POSTGRESQL__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-cluster-app
+                  key: password
+            - name: AUTHENTIK_POSTGRESQL__NAME
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-cluster-app
+                  key: dbname
+          volumeMounts:
+            - mountPath: /media
+              name: authentik-media
+            - mountPath: /certs
+              name: authentik-certs
+          envFrom:
+            - secretRef:
+                name: authentik-secrets
+      volumes:
+        - name: authentik-media
+          persistentVolumeClaim:
+            claimName: authentik-media
+        - name: authentik-certs
+          persistentVolumeClaim:
+            claimName: authentik-certs
