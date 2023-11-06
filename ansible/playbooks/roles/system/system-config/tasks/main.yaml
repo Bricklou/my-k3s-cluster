@@ -27,6 +27,11 @@
   # only when the node is in the "orange_pi" group
   when: ('orangepi' in group_names)
 
+- name: Disable zram
+  shell: systemctl disable zram-config
+  # only when the node is in the "raspberry" group
+  when: ('orangepi' in group_names)
+
 - name: Install required packages
   apt:
     pkg:
