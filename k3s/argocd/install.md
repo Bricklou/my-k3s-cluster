@@ -22,7 +22,7 @@ kubectl apply -f manifests/ingress.yaml
 And configure the admin password:
 
 ```shell
-argocd admin init-password
+argocd admin initial-password -n argocd
 ```
 
 Finally, install the image updater:
