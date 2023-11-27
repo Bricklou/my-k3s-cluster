@@ -1,5 +1,16 @@
 ---
 apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-to-https
+  namespace: authentik
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
+
+---
+apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: authentik-ingress
@@ -15,3 +26,5 @@ spec:
       services:
         - name: authentik
           port: http
+      middlewares:
+        - name: redirect-to-https
