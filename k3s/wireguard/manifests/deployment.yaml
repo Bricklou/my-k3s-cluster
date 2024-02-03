@@ -19,7 +19,7 @@ spec:
       hostname: wireguard
       containers:
         - name: wireguard
-          image: weejewel/wg-easy:latest
+          image: ghcr.io/wg-easy/wg-easy:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 51820
