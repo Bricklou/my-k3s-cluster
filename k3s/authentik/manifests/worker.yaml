@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name:  authentik-worker
-          image: ghcr.io/goauthentik/server:2023.10.7
+          image: ghcr.io/goauthentik/server:2024.2.1
           imagePullPolicy: Always
           args: [ 'worker' ]
           env:

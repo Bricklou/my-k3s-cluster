@@ -74,8 +74,9 @@ volumes:
 providers:
   file:
     filename: /data/traefik-config.yaml
-  kubernetesIngress:
-    ingressClass: traefik-internal
+  kubernetesIngress: {}
+  kubernetesCRD:
+    allowCrossNamespace: true
 
 # Port configuration
 ports:
