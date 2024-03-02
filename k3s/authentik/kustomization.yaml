@@ -7,6 +7,12 @@ resources:
   - manifests/volumes.yaml
   - manifests/redis.yaml
   - manifests/secrets.yaml
+  - manifests/clusterrole.yaml
+  - manifests/clusterrolebinding.yaml
+  - manifests/role.yaml
+  - manifests/rolebinding.yaml
+  - manifests/serviceaccount.yaml
+  - manifests/serviceaccount-secret.yaml
   - manifests/server.yaml
   - manifests/worker.yaml
   - manifests/service.yaml

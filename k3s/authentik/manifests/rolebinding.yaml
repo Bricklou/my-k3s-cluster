@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: authentik-remote-cluster
+  namespace: authentik
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: authentik-remote-cluster
+subjects:
+  - kind: ServiceAccount
+    name: authentik-remote-cluster
+    namespace: authentik

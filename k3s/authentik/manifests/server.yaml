@@ -58,8 +58,6 @@ spec:
           ports:
             - containerPort: 9000
               name: http
-            - containerPort: 389
-              name: ldap
           livenessProbe:
             httpGet:
               port: 9000
@@ -75,6 +73,7 @@ spec:
             periodSeconds: 30
             failureThreshold: 5
             timeoutSeconds: 5
+      enableServiceLinks: true
       volumes:
         - name: authentik-media
           persistentVolumeClaim:
