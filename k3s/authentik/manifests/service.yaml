@@ -9,5 +9,8 @@ spec:
       - name: http
         port: 9000
         targetPort: 9000
+      - name: ldap
+        port: 389
+        targetPort: 389
   selector:
       app: authentik-server

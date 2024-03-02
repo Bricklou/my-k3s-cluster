@@ -58,6 +58,8 @@ spec:
           ports:
             - containerPort: 9000
               name: http
+            - containerPort: 389
+              name: ldap
           livenessProbe:
             httpGet:
               port: 9000
